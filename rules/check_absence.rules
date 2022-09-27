@@ -1,0 +1,59 @@
+var Timer TimerOutAN = null
+var Timer TimerOutCN = null
+
+rule "Absence Christian!"
+when 
+    Item cFboxMacOnline_cn changed
+then
+
+    if(TimerOutCN !== null) {
+       TimerOutCN.cancel()
+       TimerOutCN = null
+    }
+
+//OPEN - I am home
+    if (cFboxMacOnline_cn.state==ON)
+    {
+        logInfo("absence_check_wifi", "CN is here")    
+        sendCommand(CNOut,OFF)
+    }
+    else {
+//CLOSED - I am out, if more then x-min, I am really out        
+        logInfo("absence_check_wifi", "CN is not here, start timer")    
+        TimerOutCN = createTimer(now.plusSeconds(300))[|
+                logInfo("absence_check_wifi", "CN is not here, timer finished, really out")    
+                sendCommand(CNOut,ON)
+                TimerOutCN?.cancel()
+                TimerOutCN = null
+            ]
+    }
+end
+
+
+rule "Absence Anne"
+when 
+    Item cFboxMacOnline_an changed
+then
+
+    if(TimerOutAN !== null) {
+       TimerOutAN.cancel()
+       TimerOutAN = null
+    }
+
+//OPEN - I am home
+    if (cFboxMacOnline_an.state==ON)
+    {
+        logInfo("absence_check_wifi", "Anne is here")    
+        sendCommand(ANOut,OFF)
+    }
+    else {
+//CLOSED - I am out, if more then x-min, I am really out        
+        logInfo("absence_check_wifi", "Anne is not here, start timer")    
+        TimerOutAN = createTimer(now.plusSeconds(300))[|
+                logInfo("absence_check_wifi", "Anne is not here, timer finished, really out")    
+                sendCommand(ANOut,ON)
+                TimerOutAN?.cancel()
+                TimerOutAN = null
+            ]
+    }
+end

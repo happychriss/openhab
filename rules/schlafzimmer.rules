@@ -1,0 +1,9 @@
+rule "DASH Schlafzimmer"
+when
+    Item Dash_PPT_1 received update ON
+then
+    logInfo("amazondashbutton", "My Dash *Schlafzimmer* has been pressed!")
+    sendCommand(Lights,OFF)
+    sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,OFF)
+    sendCommand(AbsenceMode,OFF)
+end

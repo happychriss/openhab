@@ -1,0 +1,10 @@
+rule "Init"
+when
+	System started
+then
+ sendCommand(AbsenceMode,OFF)
+ sendCommand(CNOut,OFF)
+ sendCommand(ANOut,OFF)
+ sendCommand(AbsenceWifi,OFF)
+ sendCommand(SunIsDown,OFF)
+end

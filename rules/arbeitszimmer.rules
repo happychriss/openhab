@@ -1,0 +1,96 @@
+
+// Deckenlampe  Smart Switch  ************************************************************
+rule "SmartSwitch1 Arbeitszimmer Deckenlampe ON"
+when
+    Item SmartSwitch2 received update ON
+then
+    logInfo("Arbeitszimmer - Sonoff1 Deckenlampe", "SW-1 Pressed: OFF") 
+    sendCommand(Sonoff1,OFF)
+end
+
+rule "SmartSwitch1 Arbeitszimmer Deckenlampe OFF"
+when
+    Item SmartSwitch2 received update OFF
+then
+    logInfo("Arbeitszimmer - Sonoff1 Deckenlampe", "SW-1 Pressed: ON") 
+    sendCommand(Sonoff1,ON)
+end
+
+
+// Stehlampe  Smart Switch ************************************************************
+
+rule "SmartSwitch2 Arbeitszimmer Stehlampe ON"
+when
+    Item SmartSwitch1 received update ON
+then
+    logInfo("Arbeitszimmer - Stehlampe", "SW-2 Pressed: OFF") 
+    sendCommand(Hue_Dimm_Toggle,OFF)
+end
+
+rule "SmartSwitch2 Arbeitszimmer Stehlampe OFF"
+when
+    Item SmartSwitch1 received update OFF
+then
+    logInfo("Arbeitszimmer - Stehlampe", "SW-2 Pressed: ON") 
+    sendCommand(Hue_Dimm_Toggle,ON)
+end
+
+// All Lights On/OFF Arbeitzimmer Dash-Button *****************************************************
+
+
+rule "DASH Arbeitszimmer"
+when
+  Item Dash_GBC_2 received update ON or
+  Item Dash_PPT_2 received update ON
+
+then
+    logInfo("amazondashbutton", "My Dash *Arbeit-All* has been pressed!")
+    if(Hue_Dimm_Toggle.state == ON)
+    {
+            sendCommand(Hue_Dimm_Toggle,OFF)
+            sendCommand(Sonoff1,OFF)
+    }
+    else {
+            sendCommand(Hue_Dimm_Toggle,ON)
+            sendCommand(Sonoff1,ON)
+    }
+end
+
+
+
+// Spotify Music ********************************************************************************
+rule "Tradfi-4 - Musik Arbeitszimmer"
+when
+    Channel "deconz:switch:homeserver:tradfri-4:buttonevent" triggered
+then
+    logInfo("tradfi","Tradfi-4 *Arbeitszimmer Music* has been pressed")
+        
+      var actionName = receivedEvent
+
+     logInfo("tradfi", actionName)
+     switch(actionName) {
+
+     // Short: Decke
+     // Long: Lampe Fensterbank
+
+       case "1002": {  //short press ON - Decke
+//            Heating_Kueche_Comfort.sendCommand(ON)
+             sendCommand(Sonoff4,ON)
+         }
+
+         case "2002": { //short press OFF - Decke
+//            Heating_Kueche_Comfort.sendCommand(OFF)
+              sendCommand(Sonoff4,OFF)
+         }
+
+     } 
+
+end
+
+rule "MusicOff - Night Mode - Switch off at night"
+when
+	Time cron "0 0 23 1/1 * ? *"
+then
+    sendCommand(Sonoff4,OFF)
+end
+

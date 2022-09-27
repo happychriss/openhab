@@ -1,0 +1,12 @@
+  Bridge avmfritz:fritzbox:1 "FRITZ!Box" [ ipAddress="192.168.1.1", password="@Hannelore12", user="openhab" ] {
+    Thing FRITZ_DECT_301 099950124754 "FRITZ!DECT 301 #1 Arbeitszimmer" [ ain="099950124754" ]
+    Thing FRITZ_DECT_301 099950581490 "FRITZ!DECT 301 #2 Arbeitszimmer" [ ain="099950581490" ]    
+ } 
+
+ Bridge tr064:fritzbox:fritzboxcm "Fritz!Box" [host="192.168.1.1", refresh=5, user="xxxxx", password="xxxx"]   
+ {
+  Thing subdeviceLan LAN "Fritzbox LAN"  [ uuid="uuid:75802409-bccb-40e7-8e6b-3810D5A6388D", 
+      macOnline=   "8C:B8:4A:5A:69:72" // CN 
+                      ,"7C:10:C9:0B:8F:80" // AN
+  ]
+ }

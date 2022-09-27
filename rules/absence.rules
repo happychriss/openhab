@@ -1,0 +1,141 @@
+var Timer tRandomLights = null
+var Number NightActive = 0
+
+/// *******  when its time to have some light on
+
+rule "SetNight"
+when  Channel 'astro:sun:home:civilDusk#event' triggered START
+then
+    logInfo("absence_rule", "Astro - Sun Down (civlDusk")    
+	sendCommand(SunIsDown,ON)
+    NightActive=1 
+end
+
+rule "SetDay"
+when Channel 'astro:sun:home:civilDawn#event' triggered START
+then
+    logInfo("absence_rule", "Astro - Sun Up (civlDawn")    
+    NightActive=0 
+	sendCommand(SunIsDown,OFF)
+end
+
+rule "Turn all lights off at 23.20 if alarm is activated"
+when Time cron "0 20 23 * * ?"
+then
+	logInfo("absence_rule", "After Eleven - finisht the light show")    
+	// Clear all lights 
+	sendCommand(SunIsDown,OFF) // will trigger RandomLight to go off
+
+end
+
+/// **** Trigger Absence Mode ***********************************
+
+rule "Wifi-Absence"
+when
+	 Item AbsenceWifi changed
+then
+	 if(AbsenceWifi.state == ON)
+    {
+    logInfo("absabsence_check_wifi", "Not at home, enable absence mode")
+        sendCommand(AbsenceMode,ON)
+	}
+	else {
+    logInfo("absabsence_check_wifi", "Back at home, disable absence mode")
+		sendCommand(AbsenceMode,OFF)
+	}
+end
+
+
+rule "DASH Nerf"
+when
+    Item Dash_Nerf received update ON
+then
+    logInfo("amazondashbutton", "My Dash *Alarm On* has been pressed")
+    if(AbsenceMode.state == ON)
+    {
+        sendCommand(AbsenceMode,OFF)
+		
+		// Welcome, enable kitchen light
+		sendCommand(Ambient_Kueche_Toggle,ON)
+
+    }
+    else {
+        sendCommand(AbsenceMode,ON)
+
+		// Goodbye, Indicate that its enabled
+		sendCommand(Ambient_Kueche_Toggle,ON)
+		tRandomLights = createTimer(now.plusSeconds(10)) [|
+			sendCommand(Ambient_Kueche_Toggle,OFF)
+		]
+    }
+end
+
+
+// ******************   Nobody at home, switch all off and welcome when back
+
+rule "Absence Alarm ON"
+when
+    Item AbsenceMode changed
+then
+  if(AbsenceMode.state == ON)
+  {
+	logInfo("absence_rule", "Alarm Mode was enabled")    
+	sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,OFF)
+	sendCommand(FRITZDECT3011Kueche_RadiatorMode,OFF)	
+	sendCommand(Sonoff4,OFF) // no music needed
+	sendCommand(Lights,OFF)
+  } else  
+  {
+	logInfo("absence_rule", "Alarm Mode was disabled")      
+
+	if (NightActive==1) {
+		logInfo("absence_rule", "Coming home and its dark - welcome light in the kitchen")      
+		createTimer(now.plusSeconds(5)) [
+        sendCommand(Ambient_Kueche_Toggle,ON)
+		]
+	}
+
+  }
+end
+
+// ***** Trigger Random Lighs in case of absence 
+
+rule "Random Light when Anne&Christian are out and Sun is down - ENABLE"
+when
+	Item RandomLight changed to ON
+	// Time cron "0 */15 6-8,15-23 * * ?"
+then
+	logInfo("absence_rule", "Absence - Random Light Setting Active")    
+	// Create a timer with a random value
+
+	Lights_Random.members.forEach [s | logInfo("absence_rule", s.name + " equals " + s.state.toString)]
+
+	var int randomTime = (new java.util.Random).nextInt(600)
+	logInfo("org.openhab","Setting random lights timer to " + randomTime + " seconds.")
+	
+	tRandomLights = createTimer(now.plusSeconds(randomTime)) [|
+		var randLightIndex = (new java.util.Random).nextInt(Lights_Random.members.size)
+		var randLightStateCurrent = Lights_Random.members.get(randLightIndex).state
+		var randLightStateNew = if (randLightStateCurrent == ON) OFF else ON
+		logInfo("org.openhab","Switching light " + Lights_Random.members.get(randLightIndex).name + " from " + randLightStateCurrent + " to " + randLightStateNew)
+		sendCommand(Lights_Random.members.get(randLightIndex), randLightStateNew)
+		var int randomTime2 = (new java.util.Random).nextInt(600)					 
+		tRandomLights.reschedule(now.plusSeconds(randomTime2)) 
+	]
+end
+
+rule "Random Light when Anne&Christian are out and Sun is down - DISABLE"
+when
+	Item RandomLight changed to OFF //
+then
+	logInfo("absence_rule", "Absence - Random Light Setting Disable")    
+	if(tRandomLights !== null) {
+		tRandomLights.cancel()
+		tRandomLights = null
+	}
+	// Clear all lights 
+	sendCommand(Lights_Random,OFF)
+  
+end
+
+

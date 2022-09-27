@@ -1,0 +1,7 @@
+astro:sun:home  [ geolocation="xxx", interval=60 ]
+astro:moon:home [ geolocation="xxx", interval=60 ]
+
+/// old values
+// astro:moon:home [ geolocation="xxx", interval=60 ]
+
+// ntp:ntp:demo  [ hostname="nl.pool.ntp.org", refreshInterval=60, refreshNtp=30 ]

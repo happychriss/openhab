@@ -1,0 +1,5 @@
+sitemap main label="Main Sitemap" {
+    Default item=Stehlampe
+    Default item=Arbeitszimmer_Toggle
+
+}

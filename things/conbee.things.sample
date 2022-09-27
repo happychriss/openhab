@@ -1,0 +1,14 @@
+// Deconz bridge works for sensors (switches), while setting the lights is done via the Hue Bridge (ip of Deconz)
+
+// Bridge for sensors
+// works only with 127.0.0.1 and not with full ip address, while hue works different
+Bridge deconz:deconz:homeserver [ host="127.0.0.1", httpPort="8084", port="8081", apikey="xxxx" ] {
+    switch              tradfri-1      "tradfri-1"        [ id="8" ] //kitchen
+    switch              tradfri-3      "tradfri-3"        [ id="4" ]
+    switch              tradfri-4      "tradfri-4"        [ id="5" ]
+    switch              tradfri-5      "tradfri-5"        [ id="6" ] //coffee switch
+    dimmablelight       kitchen-coffee      "Kitchen Coffee"        [ id="ec:1b:bd:ff:fe:a6:92:63-01" ]
+    }
+
+// Bridge for lights
+Bridge hue:bridge:2 [ ipAddress="192.168.1.110", port="8084", userName="xxxxx"]    

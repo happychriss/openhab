@@ -1,0 +1,48 @@
+// Stehlampe ************************************************************
+rule "Dash Wohnzimmer Stehlampe"
+when
+    Item Dash_Nivea received update ON
+then
+    logInfo("amazondashbutton", "My Dash *Wohn-Stehlampe* has been pressed")
+    if(Sonoff3.state == ON)
+    {
+            sendCommand(Sonoff3,OFF)
+    }
+    else {
+            sendCommand(Sonoff3,ON)
+            sendCommand(Ikea_Stimmung_Toggle,OFF) //switch off the decke
+
+    }
+end
+
+
+
+rule "Tradfi-2 - Wohnzimmer Decke"
+when
+    Item Tradfi_Wohn received update
+then
+logInfo("tradfi","Tradfi-2 pressed")
+logInfo("tradfi", Tradfi_Wohn.state.toString)
+    switch(Tradfi_Wohn.state.toString) {
+
+    // Short: Decke
+    // Long: Stehlampe
+
+      case "1002": {  //short press ON - Decke
+           sendCommand(Ikea_Stimmung_Toggle,ON)
+        }
+
+        case "2002": { //short press OFF - Decke
+            sendCommand(Ikea_Stimmung_Toggle,OFF)
+        }
+
+        case "1001": { //long press ON - Stehlampe
+            sendCommand(Sonoff3,ON)
+        }
+
+        case "2001": { //long press OFF - Stehlampe
+            sendCommand(Sonoff3,OFF)
+        }
+    }
+
+end

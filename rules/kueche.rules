@@ -1,0 +1,122 @@
+// ***************************** Decke   *************************************
+rule "Tradfi-1 - Küche"
+when
+    Channel "deconz:switch:homeserver:tradfri-1:buttonevent" triggered
+then
+logInfo("tradfi","Tradfi-1 *Kueche* has been pressed")
+
+var actionName = receivedEvent
+
+
+logInfo("tradfi", actionName)
+    switch(actionName) {
+
+    // Short: Decke
+    // Long: Lampe Fensterbank
+
+      case "1002": {  //short press ON - Decke
+            sendCommand(Ambient_Kueche_Toggle,ON)
+        }
+
+        case "2002": { //short press OFF - Decke
+            sendCommand(Ambient_Kueche_Toggle,OFF)
+        }
+
+        case "1001": { //long press ON  - Fensterbank
+             sendCommand(Sonoff_Smart_1,ON)
+             sendCommand(Ambient_Kueche_Toggle,OFF)
+             createTimer(now.plusMinutes(70))[ |
+                logInfo("fensterbank", "Start Timer for 70min")    
+                sendCommand(Sonoff_Smart_1,OFF)
+            ]
+        }
+
+        case "2001": { //long press OFF - Fensterbank
+             sendCommand(Sonoff_Smart_1,OFF)
+        }
+    }
+
+end
+
+
+// ***************************** Fensterbank  *************************************
+
+rule "Tradfi-3 - Küche Lampe Fensterbank"
+when
+    Channel "deconz:switch:homeserver:tradfri-3:buttonevent" triggered
+then
+logInfo("tradfi","Tradfi-3 *Kueche Lampe Fensterbank* has been pressed")
+
+var actionName = receivedEvent
+
+
+logInfo("tradfi", actionName)
+    switch(actionName) {
+
+    // Short: Decke
+    // Long: Lampe Fensterback
+
+      case "1002": {  //short press ON - Lampe Fensterbank
+            sendCommand(Ambient_Kueche_Dimmer,OFF)
+            sendCommand(Ikea_Stimmung_Toggle,OFF) //switch off the decke in wohnzimmer             
+            sendCommand(Sonoff_Smart_1,ON)
+            createTimer(now.plusMinutes(70))[|
+                logInfo("fensterbank", "Start Timer for 70min")    
+                sendCommand(Sonoff_Smart_1,OFF)
+
+            ]
+        }
+        case "2002": { //short press OFF - Lampe Fensterbank
+                sendCommand(Sonoff_Smart_1,OFF)
+                sendCommand(FRITZDECT3011Kueche_RadiatorMode ,OFF)    
+        }
+
+        case "1001": { //long press ON - 
+                logInfo("tradfi","Tradfi-3 pressed long ON")
+        }
+
+        case "2001": { //long press OFF - 
+                logInfo("tradfi","Tradfi-3 pressed long OFF")
+        }
+    }
+
+end
+
+
+// ***************************** Coffee Corner  *************************************
+
+rule "Tradfi-5 - Küche Coffee"
+when
+    Channel "deconz:switch:homeserver:tradfri-5:buttonevent" triggered
+then
+logInfo("tradfi","Tradfi-5 *Kueche Cofee* has been pressed")
+
+var actionName = receivedEvent
+
+
+logInfo("tradfi", actionName)
+    switch(actionName) {
+
+    // Short: Decke
+
+        case "1001",
+        case "1002": {  //short press ON - Lampe Fensterbank
+            sendCommand(Conbee_Coffe_Kitchen_Toggle ,ON)
+            sendCommand(Conbee_Coffe_Kitchen_Brightness,50)
+            createTimer(now.plusMinutes(70))[|
+                logInfo("fensterbank", "Start Timer for 70min")    
+                sendCommand(Conbee_Coffe_Kitchen_Brightness,0)
+                sendCommand(Conbee_Coffe_Kitchen_Toggle,OFF)
+
+                ]
+            }
+
+        case "2001",
+        case "2002": { //short press OFF - Lampe Fensterbank
+            sendCommand(Conbee_Coffe_Kitchen_Brightness,0)
+            sendCommand(Conbee_Coffe_Kitchen_Toggle ,OFF)
+        }
+
+    }
+
+end

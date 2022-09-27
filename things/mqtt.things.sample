@@ -1,0 +1,36 @@
+Bridge mqtt:broker:OH2mqtt "MQTT Broker" @ "MQTT" [
+    host="192.168.1.110",
+    port=1883,
+    username="xxxxx",
+    password="xxxxx"
+    // clientID ="openHAB2",
+    // qos=1,
+    // retainMessages=true
+] {
+    Thing topic sonoff1 "Sonoff1_Arbeitszimmer" @ "MQTT" {
+      Channels:
+        Type switch : ch1  "Arbeitszimmer Stehlampe" [ stateTopic="sonoff:stat/sonoff1/POWER", commandTopic="cmnd/sonoff1/POWER" ]
+    }
+
+    Thing topic sonoff3 "Sonoff3_Wohnzimmer" @ "MQTT" {
+      Channels:
+        Type switch : ch1  "Wohnzimmer Stehlampe" [ stateTopic="sonoff:stat/sonoff3/POWER", commandTopic="cmnd/sonoff3/POWER" ]
+    }
+
+   Thing topic sonoff4 "Sonoff4_Arbeitszimmer_Music" @ "MQTT" {
+      Channels:
+        Type switch : ch1  "Arbeitszimmer Music" [ stateTopic="sonoff:stat/sonoff4/POWER", commandTopic="cmnd/sonoff4/POWER" ]
+    }
+
+
+  Thing topic smart_switch_1 "Sonoff Switch Küche" @ "MQTT" {
+      Channels:
+        Type switch : ch1  "Küche Leuchte" [ stateTopic="sonoff:stat/smart_switch_1/POWER", commandTopic="cmnd/smart_switch_1/POWER" ]
+    }
+
+}
+
+
+
+
+

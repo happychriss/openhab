@@ -1,0 +1,109 @@
+// Date Time
+// DateTime MyDateTime  "Date [%1$tA, %1$td.%1$tm.%1$tY %1$tH:%1$tM]"  { channel="ntp:ntp:demo:dateTime" }
+
+
+// Welcome....all lights on
+Group:Switch:OR(ON, OFF) Lights 		"All Family Lights [(%d)]" 	
+
+// **************************************************************************************
+// Vacation Simulator
+
+Switch AbsenceMode
+Group Lights_Random
+
+
+// ****************************************************************************************
+// Detect Absence and Random Light
+
+Switch ANOut (AbsenceWifi,RandomLight)
+Switch CNOut (AbsenceWifi,RandomLight)
+Switch SunIsDown (RandomLight)
+
+//switch is set to "on" if ANOut and CNOut are set to ON
+Group:Switch:AND(ON,OFF) AbsenceWifi 
+Group:Switch:AND(ON,OFF) RandomLight 
+
+
+// ****************************************************************************************
+// Group Arbeitszimmer
+
+// Deckenleuchte
+Switch	Hue_Dimm_Toggle	(Lights,Lights_Random)	{ channel="hue:0100:0017881302dd:23:brightness" }
+Dimmer	Hue_Dimm_Dimmer	                    	{ channel="hue:0100:0017881302dd:23:brightness" }
+
+// Stehlampe
+// Switch Sonoff1 "Stehlampe" <light> (LR,gLight,Lights,Lights_Random) { mqtt="<[sonoff:stat/sonoff1/POWER:state:default], >[sonoff:cmnd/sonoff1/POWER:command:*:default]" }  
+Switch Sonoff1 "Stehlampe" <light> (LR,gLight,Lights,Lights_Random) ["Switchable"] { channel="mqtt:topic:OH2mqtt:sonoff1:ch1" }
+Switch Sonoff4 "Musik Arbeitzimmer" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:sonoff4:ch1" }
+
+// Switch on/off
+Switch SmartSwitch1 //Stehlampe
+Switch SmartSwitch2 //Deckenleuchte
+
+
+// ****************************************************************************************
+// Group Wohnzimmer
+
+// Deckenleuchte
+Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="hue:0220:1:4:brightness" }
+Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="hue:0220:1:4:brightness" }
+Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="hue:0220:1:4:color_temperature" }
+
+// Switch...no clue why I did not get him as normal Thing
+Number Tradfi_Wohn "Tradfi Wohn" (Lights,Lights_Random) { channel="deconz:switch:homeserver:5c0272fffed366f4011000:button"}
+
+
+
+
+// Stehlampe 
+// Switch Sonoff3 "StehlampeWohn" <light> (LR,gLight,Lights,Lights_Random) { mqtt="<[sonoff:stat/sonoff3/POWER:state:default], >[sonoff:cmnd/sonoff3/POWER:command:*:default]" }  
+
+Switch Sonoff3 "StehlampeWohn" <light> (LR,gLight,Lights,Lights_Random) ["Switchable"] { channel="mqtt:topic:OH2mqtt:sonoff3:ch1" }
+
+// Switch on/off
+Switch Dash_Nivea //Stehlampe
+Switch Dash_GBC_1 //Deckenlamp - not used anymore, stopped working
+Switch Dash_PPT_2 //Deckenlampe
+
+// ****************************************************************************************
+// Group Kueche
+// Switch	Ikea_Dimm_Toggle	(Light,Lights_Random)	{ channel="hue:0100:1:5:brightness" } // old, this liked keeps blinking
+// Dimmer	Ikea_Dimm_Dimmer	(Light)	{ channel="hue:0100:1:5:brightness" } // old, this liked keeps blinking
+
+// Deckenlampe
+Switch	Ambient_Kueche_Toggle	(Lights,Lights_Random)	{ channel="hue:0220:0017881302dd:24:brightness" }
+Dimmer	Ambient_Kueche_Dimmer	                        { channel="hue:0220:0017881302dd:24:brightness" }
+Dimmer	Ambient_Kueche_ColorTemp	                    { channel="hue:0220:0017881302dd:24:color_temperature" }
+
+Switch Sonoff_Smart_1 "Küchenbank" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:smart_switch_1:ch1" }
+
+// ***IKEA lamp with Conbee for kitchen, play arround *******************************************
+Switch   Conbee_Coffe_Kitchen_Toggle   (Lights)                     { channel="deconz:dimmablelight:homeserver:kitchen-coffee:brightness"}
+Dimmer   Conbee_Coffe_Kitchen_Brightness                            { channel="deconz:dimmablelight:homeserver:kitchen-coffee:brightness"}
+
+// Switch on/off
+Switch  Dash_Purina
+
+// ****************************************************************************************
+// *** Enable Alarm
+Switch  Dash_Nerf
+
+// ****************************************************************************************
+// Group Schlafzimmer - all light off
+Switch  Dash_PPT_1
+
+// ****************************************************************************************
+// DASH unassigned
+Switch  Dash_GBC_2
+
+// ***IKEA lamp with Conbee controll, play arround *******************************************
+//Switch	Conbee_Dimm_Toggle	                    	{ channel="hue:0100:2:1:brightness" }
+// Dimmer	Conbee_Dimm_Dimmer	                    	{ channel="hue:0100:2:1:brightness" }
+
+//************* Heating and Temperature
+Number:Temperature localCurrentTemperature "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:weather-and-forecast:api:local:current#temperature" }
+Number:Temperature localCurrentTemperature_2h "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:forecastHours02#temperature" }
+
+Switch Heating_Arbeitszimmer_Comfort
+Switch Heating_Kueche_Comfort
+Switch Heating_Kueche_Comfort_120min
