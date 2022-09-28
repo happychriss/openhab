@@ -28,12 +28,19 @@ then
     logInfo("heating",localCurrentTemperature.toString) 
     logInfo("heating",localCurrentTemperature_2h.toString) 
 
-    if ((Heating_Kueche_Comfort.state==ON) && (localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
+    if (Heating_Kueche_Comfort.state==ON) {
+        logInfo("heating","Heating ON send") 
+        if ((localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
             logInfo("heating","Cold enough, enable heating") 
-                  sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')                
-     } else {
+            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')                }
+        else {
             logInfo("heating","To warm, heating is not enabled") 
-                sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+        }
+
+     } else {
+        logInfo("heating","Heating Off send") 
+        sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
      }
 
 end
@@ -45,19 +52,28 @@ then
     logInfo("heating",localCurrentTemperature.toString) 
     logInfo("heating",localCurrentTemperature_2h.toString) 
 
-    if ((Heating_Kueche_Comfort.state==ON) && (localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
+   if (Heating_Kueche_Comfort.state==ON) {
+        logInfo("heating","Heating ON send") 
+        if ((localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
             logInfo("heating","Cold enough, enable heating") 
-                  sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')    
-                  createTimer(now.plusMinutes(120))[|
-                    logInfo("kueche_heizung_morgens", "Start Timer for 120min")    
-                    sendCommand(FRITZDECT3011Kueche_RadiatorMode ,'OFF')  
-                    Heating_Kueche_Comfort_120min.state=OFF  
-                    ]            
-            
-     }   else {
-           logInfo("heating","To warm, heating is not enabled") 
-       
-     }
+            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')               
+            createTimer(now.plusMinutes(120))[|
+              logInfo("kueche_heizung_morgens", "Timer for 120min finished - switch off the heating")    
+                sendCommand(FRITZDECT3011Kueche_RadiatorMode ,'OFF')  
+                Heating_Kueche_Comfort_120min.sendCommand(OFF)  
+            ]            
+      
+       }
+        else {
+            logInfo("heating","To warm, heating is not enabled") 
+            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+        }
+
+    } else {
+        logInfo("heating","Heating Off send") 
+        sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+    }
+
 
 end
 
@@ -82,7 +98,7 @@ then
             logInfo("heating","Heating remains off - ABSENCE MODE") 
         } else {
             logInfo("heating","Homeoffice - Make it warm all day") 
-            Heating_Arbeitszimmer_Comfort.sendCommand(ON)
+            Heating_Arbeitszimmer_Comfort.sendCommand('ON')
         }
 
 end
