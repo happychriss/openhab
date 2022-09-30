@@ -104,7 +104,7 @@ end
 
 rule "Heating Arbeitszimmer- Night Mode - Switch off at night"
 when
-	Time cron "0 0 23 1/1 * ? *"
+	Time cron "0 0 23-01 1/1 * ? *"
 then
             Heating_Arbeitszimmer_Comfort.sendCommand(OFF)
 end
