@@ -80,8 +80,8 @@ then
   if(AbsenceMode.state == ON)
   {
 	logInfo("absence_rule", "Alarm Mode was enabled")    
-	sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,OFF)
-	sendCommand(FRITZDECT3011Kueche_RadiatorMode,OFF)	
+	Heating_Arbeitszimmer_Comfort.sendCommand(OFF)
+    Heating_Kueche_Comfort.sendCommand(OFF)
 	sendCommand(Sonoff4,OFF) // no music needed
 	sendCommand(Lights,OFF)
   } else  

@@ -68,7 +68,7 @@ logInfo("tradfi", actionName)
         }
         case "2002": { //short press OFF - Lampe Fensterbank
                 sendCommand(Sonoff_Smart_1,OFF)
-                sendCommand(FRITZDECT3011Kueche_RadiatorMode ,OFF)    
+                Heating_Kueche_Comfort.sendCommand(OFF)
         }
 
         case "1001": { //long press ON - 
