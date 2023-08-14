@@ -28,8 +28,9 @@ Group:Switch:AND(ON,OFF) RandomLight
 // Group Arbeitszimmer
 
 // Deckenleuchte
-Switch	Hue_Dimm_Toggle	(Lights,Lights_Random)	{ channel="hue:0100:0017881302dd:23:brightness" }
-Dimmer	Hue_Dimm_Dimmer	                    	{ channel="hue:0100:0017881302dd:23:brightness" }
+Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
+Dimmer	arbeitszimmer_dimmer	               	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
+
 
 // Stehlampe
 // Switch Sonoff1 "Stehlampe" <light> (LR,gLight,Lights,Lights_Random) { mqtt="<[sonoff:stat/sonoff1/POWER:state:default], >[sonoff:cmnd/sonoff1/POWER:command:*:default]" }  
@@ -45,15 +46,9 @@ Switch SmartSwitch2 //Deckenleuchte
 // Group Wohnzimmer
 
 // Deckenleuchte
-Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="hue:0220:1:4:brightness" }
-Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="hue:0220:1:4:brightness" }
-Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="hue:0220:1:4:color_temperature" }
-
-// Switch...no clue why I did not get him as normal Thing
-Number Tradfi_Wohn "Tradfi Wohn" (Lights,Lights_Random) { channel="deconz:switch:homeserver:5c0272fffed366f4011000:button"}
-
-
-
+Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:brightness" }
+Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:brightness" }
+Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:color_temperature"}
 
 // Stehlampe 
 // Switch Sonoff3 "StehlampeWohn" <light> (LR,gLight,Lights,Lights_Random) { mqtt="<[sonoff:stat/sonoff3/POWER:state:default], >[sonoff:cmnd/sonoff3/POWER:command:*:default]" }  
@@ -67,24 +62,30 @@ Switch Dash_PPT_2 //Deckenlampe
 
 // ****************************************************************************************
 // Group Kueche
-// Switch	Ikea_Dimm_Toggle	(Light,Lights_Random)	{ channel="hue:0100:1:5:brightness" } // old, this liked keeps blinking
-// Dimmer	Ikea_Dimm_Dimmer	(Light)	{ channel="hue:0100:1:5:brightness" } // old, this liked keeps blinking
 
 // Deckenlampe
-Switch	Ambient_Kueche_Toggle	(Lights,Lights_Random)	{ channel="hue:0220:0017881302dd:24:brightness" }
-Dimmer	Ambient_Kueche_Dimmer	                        { channel="hue:0220:0017881302dd:24:brightness" }
-Dimmer	Ambient_Kueche_ColorTemp	                    { channel="hue:0220:0017881302dd:24:color_temperature" }
+Switch	Ambient_Kueche_Toggle	(Lights,Lights_Random)	{channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:brightness"}
+Dimmer	Ambient_Kueche_Dimmer	                        {channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:brightness"}
+Dimmer	Ambient_Kueche_ColorTemp	                   {channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:color_temperature"}
+
 
 Switch Sonoff_Smart_1 "Küchenbank" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:smart_switch_1:ch1" }
 
+Switch   Conbee_Coffe_Kitchen_Toggle   (Lights)                     {channel="deconz:dimmablelight:homeserver:ec1bbdfffea6926301:brightness"}
+Dimmer   Conbee_Coffe_Kitchen_Brightness                            {channel="deconz:dimmablelight:homeserver:ec1bbdfffea6926301:brightness"}
+
+
 // ***IKEA lamp with Conbee for kitchen, play arround *******************************************
-Switch   Conbee_Coffe_Kitchen_Toggle   (Lights)                     { channel="deconz:dimmablelight:homeserver:kitchen-coffee:brightness"}
-Dimmer   Conbee_Coffe_Kitchen_Brightness                            { channel="deconz:dimmablelight:homeserver:kitchen-coffee:brightness"}
+Switch   Conbee_Coffe_Kitchen_Toggle_2   (Lights)                     {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
+Dimmer   Conbee_Coffe_Kitchen_Brightness_2                            {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
+
+// Switch...no clue why I did not get him as normal Thing
+Number Tradfi_Kueche "Tradfi Kueche" (Lights,Lights_Random) { channel="deconz:switch:homeserver:5c0272fffed366f4011000:button"}
 
 // Switch on/off
 Switch  Dash_Purina
 
-// ****************************************************************************************
+// *****************************************************************************************
 // *** Enable Alarm
 Switch  Dash_Nerf
 
@@ -96,10 +97,6 @@ Switch  Dash_PPT_1
 // DASH unassigned
 Switch  Dash_GBC_2
 
-// ***IKEA lamp with Conbee controll, play arround *******************************************
-//Switch	Conbee_Dimm_Toggle	                    	{ channel="hue:0100:2:1:brightness" }
-// Dimmer	Conbee_Dimm_Dimmer	                    	{ channel="hue:0100:2:1:brightness" }
-
 //************* Heating and Temperature
 Number:Temperature localCurrentTemperature "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:weather-and-forecast:api:local:current#temperature" }
 Number:Temperature localCurrentTemperature_2h "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:forecastHours02#temperature" }
@@ -107,3 +104,4 @@ Number:Temperature localCurrentTemperature_2h "Current temperature [%.1f %unit%]
 Switch Heating_Arbeitszimmer_Comfort
 Switch Heating_Kueche_Comfort
 Switch Heating_Kueche_Comfort_120min
+Switch Heating_ToWarm

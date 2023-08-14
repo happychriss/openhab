@@ -20,7 +20,7 @@ then
     else {
 //CLOSED - I am out, if more then x-min, I am really out        
         logInfo("absence_check_wifi", "CN is not here, start timer")    
-        TimerOutCN = createTimer(now.plusSeconds(300))[|
+        TimerOutCN = createTimer(now.plusMinutes(30))[|
                 logInfo("absence_check_wifi", "CN is not here, timer finished, really out")    
                 sendCommand(CNOut,ON)
                 TimerOutCN?.cancel()
@@ -49,7 +49,7 @@ then
     else {
 //CLOSED - I am out, if more then x-min, I am really out        
         logInfo("absence_check_wifi", "Anne is not here, start timer")    
-        TimerOutAN = createTimer(now.plusSeconds(300))[|
+        TimerOutAN = createTimer(now.plusMinutes(30))[|
                 logInfo("absence_check_wifi", "Anne is not here, timer finished, really out")    
                 sendCommand(ANOut,ON)
                 TimerOutAN?.cancel()

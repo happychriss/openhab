@@ -21,7 +21,7 @@ rule "Tradfi-2 - Wohnzimmer Decke"
 when
     Item Tradfi_Wohn received update
 then
-logInfo("tradfi","Tradfi-2 pressed")
+logInfo("tradfi","Tradfi-Wohn pressed")
 logInfo("tradfi", Tradfi_Wohn.state.toString)
     switch(Tradfi_Wohn.state.toString) {
 

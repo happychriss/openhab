@@ -1,3 +1,4 @@
+// ***************** Generic commands for heating *************************************************************************************
 // ***************** Arbeitszimmer ****************************************************************************************************
 
 
@@ -17,16 +18,20 @@ then
 
         if ((localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
             logInfo("heating","Cold enough, enable heating") 
-            sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,'COMFORT')  }
+            sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,'COMFORT')  
+            sendCommand(Heating_ToWarm,OFF)                      
+            }
         else {
             logInfo("heating","To warm, heating is not enabled") 
             sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,'OFF')  
+            sendCommand(Heating_ToWarm,ON)                                  
         }
     }
 
      else {
         logInfo("heating","Heating Off send") 
             sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,'OFF')  
+            sendCommand(Heating_ToWarm,OFF)                                              
      }
 
 
@@ -36,7 +41,7 @@ end
 
 
 rule "Heating Kueche"
-when  Item Heating_Kueche_Comfort changed
+when  Item Heating_Kueche_Comfort received update 
 then
     logInfo("heating","Heating_Kueche_Comfort") 
 
@@ -45,25 +50,30 @@ then
         logInfo("heating",localCurrentTemperature.toString) 
         logInfo("heating",localCurrentTemperature_2h.toString) 
 
-        if ((localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) 
+        if (localCurrentTemperature_2h.state<18|°C) 
         {
             logInfo("heating","Cold enough, enable heating") 
             sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')                
+            sendCommand(Heating_ToWarm,OFF)                      
         }
         else {
             logInfo("heating","To warm, heating is not enabled") 
-            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')   
+            Heating_Kueche_Comfort_120min.postUpdate(OFF) 
+            sendCommand(Heating_ToWarm,ON)  
         }
     }
     else {
         logInfo("heating","Heating Off send") 
         sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+        Heating_Kueche_Comfort_120min.postUpdate(OFF)         
+        sendCommand(Heating_ToWarm,OFF)          
      }
 
 end
 
 rule "Heating Kueche 120min"
-when  Item Heating_Kueche_Comfort_120min changed
+when  Item Heating_Kueche_Comfort_120min received update 
 then
     logInfo("heating","Heating_Kueche_Comfort_120h")    
 
@@ -72,23 +82,27 @@ then
         logInfo("heating",localCurrentTemperature.toString) 
         logInfo("heating",localCurrentTemperature_2h.toString) 
 
-        if ((localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
+        if (localCurrentTemperature_2h.state<18|°C) {
             logInfo("heating","Cold enough, enable heating") 
             sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')               
+            sendCommand(Heating_ToWarm,OFF)                                  
             createTimer(now.plusMinutes(90))[|
               logInfo("kueche_heizung_morgens", "Timer for 90min finished - switch off the heating")    
                 Heating_Kueche_Comfort_120min.sendCommand(OFF)  
+                Heating_Kueche_Comfort.postUpdate(OFF)         
             ]            
       
        }
         else {
             logInfo("heating","To warm, heating is not enabled") 
-            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+            sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')  
+            sendCommand(Heating_ToWarm,ON)  
         }
 
     } else {
         logInfo("heating","Heating Off send") 
         sendCommand(FRITZDECT3011Kueche_RadiatorMode,'OFF')    
+        sendCommand(Heating_ToWarm,OFF)          
     }
 
 
@@ -109,7 +123,7 @@ then
             Heating_Arbeitszimmer_Comfort.sendCommand(OFF)
 end
 
-rule "Heating Arbeitszimmer- Worday with Homeoffice "
+/* rule "Heating Arbeitszimmer- Workday with Homeoffice "
 when
 	Time cron "0 30 8 ? * MON,TUE,WED,THU,FRI *"
 then
@@ -120,7 +134,7 @@ then
             Heating_Arbeitszimmer_Comfort.sendCommand(ON)
         }
 
-end
+end */
 
 // Make it warm at weekend and in the evening
 
@@ -149,11 +163,13 @@ end
     } else {
         // CN at homw, make it warm
         var Number hours = now.getHour
-        logInfo("heating",hours.toString) 
+        logInfo("heating","Time (hour)"+hours.toString) 
 
-        if (hours <= 22) {
+        if ((hours <= 22) && (hours>7)) {
             logInfo("heating","Christian coming home  - make it warm - Heating to COMFORT" ) 
             Heating_Arbeitszimmer_Comfort.sendCommand(ON)
+        } else {
+            logInfo("heating","Christian coming home  - but he should better sleep now" ) 
         }
     }
  end
@@ -187,14 +203,14 @@ when
 	 Time cron "0 45 6 ? * MON,TUE,WED,THU,FRI *"
 then
     if (CNOut.state==OFF) {
-        logInfo("heating","Good Morning - on Wordays") 
+        logInfo("heating","Kueche: Good Morning - on Workdays") 
         Heating_Kueche_Comfort_120min.sendCommand(ON)
     }
 end
 
 rule "Heating Kitchen - Good Morning on Weekend"
 when
-	 Time cron "0 45 7 ? * SAT,SUN *"
+	 Time cron "0 15 8 ? * SAT,SUN *"
 then
     if (CNOut.state==OFF) {
         logInfo("heating","Good Morning - on Weekend") 
@@ -205,7 +221,7 @@ end
 
 rule "Heating Kitchen - Lunch!"
 when
-		Time cron "0 30 11 1/1 * ? *"
+		Time cron "0 45 11 1/1 * ? *"
 then
     if (CNOut.state==OFF) {
         logInfo("heating","Lunch with Christian at home") 
@@ -231,7 +247,7 @@ when
 	 Time cron "0 00 8 ? * MON,TUE,WED,THU,FRI *"
 then
     if (CNOut.state==OFF) {
-                logInfo("heating","Good Morning - on Wordays") 
+                logInfo("heating","Arbeitszimmer:Good Morning - on Wordays") 
                 Heating_Arbeitszimmer_Comfort.sendCommand(ON)
                
     }

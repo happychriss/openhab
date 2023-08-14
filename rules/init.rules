@@ -7,4 +7,5 @@ then
  sendCommand(ANOut,OFF)
  sendCommand(AbsenceWifi,OFF)
  sendCommand(SunIsDown,OFF)
+ sendCommand(Heating_ToWarm,OFF)
 end
