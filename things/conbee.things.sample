@@ -1,14 +1,16 @@
-// Deconz bridge works for sensors (switches), while setting the lights is done via the Hue Bridge (ip of Deconz)
-
-// Bridge for sensors
 // works only with 127.0.0.1 and not with full ip address, while hue works different
-Bridge deconz:deconz:homeserver [ host="127.0.0.1", httpPort="8084", port="8081", apikey="xxxx" ] {
-    switch              tradfri-1      "tradfri-1"        [ id="8" ] //kitchen
-    switch              tradfri-3      "tradfri-3"        [ id="4" ]
-    switch              tradfri-4      "tradfri-4"        [ id="5" ]
-    switch              tradfri-5      "tradfri-5"        [ id="6" ] //coffee switch
-    dimmablelight       kitchen-coffee      "Kitchen Coffee"        [ id="ec:1b:bd:ff:fe:a6:92:63-01" ]
-    }
+Bridge deconz:deconz:homeserver [ host="127.0.0.1", httpPort="8084", port="8081", apikey="xxxxxxxx" ] {
+    switch              oh-kueche      "tradfri-küche"        [ id="9" ] //kitchen
+    switch              tradfri-3      "tradfri-fensterbank"  [ id="4" ] //fensterbank
+    switch              tradfri-4      "tradfri-musik"        [ id="5" ] //musik
+    switch              tradfri-5      "tradfri-coffe"        [ id="6" ] //coffee switch
+    switch              oh-arbeit      "tradfri-arbeitszimmer"        [ id="11" ] 
+    switch              oh-wohnzimmer      "tradfri-wohnzimmer"        [ id="10" ] 
 
-// Bridge for lights
-Bridge hue:bridge:2 [ ipAddress="192.168.1.110", port="8084", userName="xxxxx"]    
+    dimmablelight               oh-arbeitszimmer-decke [ id="5" ]
+    dimmablelight               oh-coffee-corner [ id="4" ]
+    dimmablelight               oh-coffee-corner-2 [ id="11" ]
+    dimmablelight               oh-wohnzimmer-decke-2 [ id="10" ]
+    colortemperaturelight       oh-wohnzimmer-decke-klar "Wohnzimmer Klar" [ id="13" ]
+    colortemperaturelight       oh-kueche-decke "Kueche Decke" [ id="6" ]
+}
