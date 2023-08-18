@@ -79,9 +79,6 @@ Dimmer   Conbee_Coffe_Kitchen_Brightness                            {channel="de
 Switch   Conbee_Coffe_Kitchen_Toggle_2   (Lights)                     {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
 Dimmer   Conbee_Coffe_Kitchen_Brightness_2                            {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
 
-// Switch...no clue why I did not get him as normal Thing
-Number Tradfi_Kueche "Tradfi Kueche" (Lights,Lights_Random) { channel="deconz:switch:homeserver:5c0272fffed366f4011000:button"}
-
 // Switch on/off
 Switch  Dash_Purina
 

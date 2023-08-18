@@ -1,11 +1,13 @@
 // ***************************** Decke   *************************************
 rule "Tradfi- Küche Decke"
 when
-    Item Tradfi_Kueche received update
+    Channel "deconz:switch:homeserver:oh-kueche:buttonevent" triggered
 then
-logInfo("tradfi","Tradfi-Küche pressed")
-logInfo("tradfi", Tradfi_Kueche.state.toString)
-    switch(Tradfi_Kueche.state.toString) {
+var actionName = receivedEvent
+
+
+logInfo("tradfi", actionName)
+    switch(actionName) {
 
     // Short: Decke
     // Long: Lampe Fensterbank
