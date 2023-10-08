@@ -82,12 +82,12 @@ then
         logInfo("heating",localCurrentTemperature.toString) 
         logInfo("heating",localCurrentTemperature_2h.toString) 
 
-        if (localCurrentTemperature_2h.state<18|°C) {
+        if (localCurrentTemperature_2h.state<19|°C) {
             logInfo("heating","Cold enough, enable heating") 
             sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')               
             sendCommand(Heating_ToWarm,OFF)                                  
-            createTimer(now.plusMinutes(90))[|
-              logInfo("kueche_heizung_morgens", "Timer for 90min finished - switch off the heating")    
+            createTimer(now.plusMinutes(60))[|
+              logInfo("kueche_heizung_morgens", "Timer for 60min finished - switch off the heating")    
                 Heating_Kueche_Comfort_120min.sendCommand(OFF)  
                 Heating_Kueche_Comfort.postUpdate(OFF)         
             ]            
@@ -198,6 +198,7 @@ then
     }
 end
 
+/*
 rule "Heating Kitchen - Good Morning on Workdays"
 when
 	 Time cron "0 45 6 ? * MON,TUE,WED,THU,FRI *"
@@ -207,6 +208,7 @@ then
         Heating_Kueche_Comfort_120min.sendCommand(ON)
     }
 end
+*/
 
 rule "Heating Kitchen - Good Morning on Weekend"
 when
@@ -242,14 +244,15 @@ then
     }
 end
 
+/*
 rule "Heating Arbeitszimmer - Good Morning on Workdays"
 when
 	 Time cron "0 00 8 ? * MON,TUE,WED,THU,FRI *"
 then
-    if (CNOut.state==OFF) {
+if (CNOut.state==OFF) {
                 logInfo("heating","Arbeitszimmer:Good Morning - on Wordays") 
                 Heating_Arbeitszimmer_Comfort.sendCommand(ON)
                
-    }
+}
 end
-
+*/

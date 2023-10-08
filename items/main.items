@@ -79,8 +79,13 @@ Dimmer   Conbee_Coffe_Kitchen_Brightness                            {channel="de
 Switch   Conbee_Coffe_Kitchen_Toggle_2   (Lights)                     {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
 Dimmer   Conbee_Coffe_Kitchen_Brightness_2                            {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
 
+// ** Plug on/off swtich 
+ Switch Conbee_PlugOnOff_Kitchen_Coffee                                  {channel="deconz:onofflight:homeserver:5c0272fffec8c86c01:switch"}
+
 // Switch on/off
 Switch  Dash_Purina
+
+Switch GoodWatch
 
 // *****************************************************************************************
 // *** Enable Alarm
