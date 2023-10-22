@@ -146,13 +146,13 @@ then
             Heating_Kueche_Comfort_120min.sendCommand(ON) // only 60min 
             logInfo("CoffeeMachine", "Start Coffee-Machine in 20min")        
             // after 20 min enable the coffee machine
-            createTimer(now.plusMinutes(20))[|
+            createTimer(now.plusMinutes(25))[|
                 logInfo("GoodWatch","Enable Coffee Machine for 20min")
 
                 sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,ON)
 
                 // give it 20min to make the cofee
-                createTimer(now.plusMinutes(25))[|
+                createTimer(now.plusMinutes(38))[|
                     logInfo("CoffeeMachine", "End Timer Coffee-Machine, switch off")    
                     sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
 

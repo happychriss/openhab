@@ -66,7 +66,6 @@ Switch Dash_PPT_2 //Deckenlampe
 // Deckenlampe
 Switch	Ambient_Kueche_Toggle	(Lights,Lights_Random)	{channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:brightness"}
 Dimmer	Ambient_Kueche_Dimmer	                        {channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:brightness"}
-Dimmer	Ambient_Kueche_ColorTemp	                   {channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:color_temperature"}
 
 
 Switch Sonoff_Smart_1 "Küchenbank" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:smart_switch_1:ch1" }
