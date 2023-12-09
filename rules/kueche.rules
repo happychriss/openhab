@@ -99,11 +99,11 @@ logInfo("tradfi", actionName)
     // Short: Decke
 
         
-        case "1002": {  //short press ON - Lampe Fensterbank
+        case "1002": {  //short press ON - EnableLight
             sendCommand(Conbee_Coffe_Kitchen_Toggle ,ON)
             sendCommand(Conbee_Coffe_Kitchen_Brightness,50)
             createTimer(now.plusMinutes(70))[|
-                logInfo("fensterbank", "Start Timer for 70min")    
+                logInfo("Coffee Light", "Start Timer for 70min")    
                 sendCommand(Conbee_Coffe_Kitchen_Brightness,0)
                 sendCommand(Conbee_Coffe_Kitchen_Toggle,OFF)
 
@@ -119,9 +119,8 @@ logInfo("tradfi", actionName)
         case "1001": {//long press ON - Kaffeemaschine
             sendCommand(Conbee_PlugOnOff_Kitchen_Coffee ,ON)
             createTimer(now.plusMinutes(40))[|
-            logInfo("CoffeeMachine", "Start Timer for 40min")    
-            sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
-
+                logInfo("CoffeeMachine", "Start Timer for 40min")    
+                sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
             ]
         }
 
@@ -134,33 +133,3 @@ logInfo("tradfi", actionName)
 end
 
 
-// Wakeup by Goodwatch 30min before breakfast
-rule "Goodwatch"
-when
-	 Item GoodWatch received command ON
-then
-        GoodWatch.state=OFF
-        logInfo("GoodWatch","Goodwatch Morning Routine")
-
-        if (now.getHour<10) {
-            Heating_Kueche_Comfort_120min.sendCommand(ON) // only 60min 
-            logInfo("CoffeeMachine", "Start Coffee-Machine in 20min")        
-            // after 20 min enable the coffee machine
-            createTimer(now.plusMinutes(25))[|
-                logInfo("GoodWatch","Enable Coffee Machine for 20min")
-
-                sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,ON)
-
-                // give it 20min to make the cofee
-                createTimer(now.plusMinutes(38))[|
-                    logInfo("CoffeeMachine", "End Timer Coffee-Machine, switch off")    
-                    sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
-
-                ] // timer switch off coffee machine again
-
-            ] // tmer enable coffee machine
-        } else {
-            logInfo("GoodWatch", "Skipping Routine, its not morning anymore")    
-        }
-
-end

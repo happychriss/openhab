@@ -41,6 +41,13 @@ Switch Sonoff4 "Musik Arbeitzimmer" <light> (LR,gLight,Lights) ["Switchable"] { 
 Switch SmartSwitch1 //Stehlampe
 Switch SmartSwitch2 //Deckenleuchte
 
+Number:Temperature      Temperature_Arbeitszimmer_sonoff "Arbeitszimmer [%.1f °C]"   <temperature>   { channel="deconz:temperaturesensor:homeserver:3c2ef5fffebd43dc010402:temperature" }
+Number:Temperature      Temperature_Draussen_sonoff "Draussen [%.1f °C]"   <temperature>   { channel="deconz:temperaturesensor:homeserver:84ba20fffecf3293010402:temperature" }
+
+Number:Dimensionless    Humidity_Arbeitszimmer_sonoff "Humidity Arbeitszimmer [%.1f %%]"      <humidity>      { channel="deconz:humiditysensor:homeserver:3c2ef5fffebd43dc010405:humidity" }
+Number:Dimensionless    Humidity_Draussen_sonoff  "Humidity Draussen [%.1f %%]"      <humidity>      { channel="deconz:humiditysensor:homeserver:84ba20fffecf3293010405:humidity" }
+
+
 
 // ****************************************************************************************
 // Group Wohnzimmer
@@ -61,7 +68,7 @@ Switch Dash_GBC_1 //Deckenlamp - not used anymore, stopped working
 Switch Dash_PPT_2 //Deckenlampe
 
 // ****************************************************************************************
-// Group Kueche
+// Group Kueche 
 
 // Deckenlampe
 Switch	Ambient_Kueche_Toggle	(Lights,Lights_Random)	{channel="deconz:colortemperaturelight:homeserver:f082c0fffe13e7c201:brightness"}
@@ -70,13 +77,8 @@ Dimmer	Ambient_Kueche_Dimmer	                        {channel="deconz:colortempe
 
 Switch Sonoff_Smart_1 "Küchenbank" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:smart_switch_1:ch1" }
 
-Switch   Conbee_Coffe_Kitchen_Toggle   (Lights)                     {channel="deconz:dimmablelight:homeserver:ec1bbdfffea6926301:brightness"}
-Dimmer   Conbee_Coffe_Kitchen_Brightness                            {channel="deconz:dimmablelight:homeserver:ec1bbdfffea6926301:brightness"}
-
-
-// ***IKEA lamp with Conbee for kitchen, play arround *******************************************
-Switch   Conbee_Coffe_Kitchen_Toggle_2   (Lights)                     {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
-Dimmer   Conbee_Coffe_Kitchen_Brightness_2                            {channel="deconz:dimmablelight:homeserver:f082c0fffe331a1401:brightness"}
+Switch   Conbee_Coffe_Kitchen_Toggle   (Lights)                     {channel="deconz:dimmablelight:homeserver:b43a31fffe555e1101:brightness"}
+Dimmer   Conbee_Coffe_Kitchen_Brightness                            {channel="deconz:dimmablelight:homeserver:b43a31fffe555e1101:brightness"}
 
 // ** Plug on/off swtich 
  Switch Conbee_PlugOnOff_Kitchen_Coffee                                  {channel="deconz:onofflight:homeserver:5c0272fffec8c86c01:switch"}
@@ -103,6 +105,11 @@ Number:Temperature localCurrentTemperature "Current temperature [%.1f %unit%]" <
 Number:Temperature localCurrentTemperature_2h "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:forecastHours02#temperature" }
 
 Switch Heating_Arbeitszimmer_Comfort
+
 Switch Heating_Kueche_Comfort
 Switch Heating_Kueche_Comfort_120min
+
+Switch Heating_Badezimmer_Comfort
+Switch Heating_Badezimmer_Comfort_120min
+
 Switch Heating_ToWarm

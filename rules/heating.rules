@@ -86,8 +86,8 @@ then
             logInfo("heating","Cold enough, enable heating") 
             sendCommand(FRITZDECT3011Kueche_RadiatorMode,'COMFORT')               
             sendCommand(Heating_ToWarm,OFF)                                  
-            createTimer(now.plusMinutes(60))[|
-              logInfo("kueche_heizung_morgens", "Timer for 60min finished - switch off the heating")    
+            createTimer(now.plusMinutes(90))[|
+              logInfo("kueche_heizung_morgens", "Timer for 90min finished - switch off the heating")    
                 Heating_Kueche_Comfort_120min.sendCommand(OFF)  
                 Heating_Kueche_Comfort.postUpdate(OFF)         
             ]            
@@ -110,6 +110,83 @@ end
 
 
 
+// ***************** Badezimmer  ****************************************************************************************************
+
+
+rule "Heating Badezimmer"
+when  Item Heating_Badezimmer_Comfort received update 
+then
+    logInfo("heating","Heating_Badezimmer_Comfort") 
+
+    if (Heating_Badezimmer_Comfort.state==ON) {
+        logInfo("heating","Heating Badezimmer ON send") 
+        logInfo("heating",localCurrentTemperature.toString) 
+        logInfo("heating",localCurrentTemperature_2h.toString) 
+
+        if (localCurrentTemperature_2h.state<10|°C) 
+        {
+            logInfo("heating","Cold enough, enable heating") 
+            sendCommand(FRITZDECT3011Badezimmer_RadiatorMode,'COMFORT')                
+            sendCommand(Heating_ToWarm,OFF)                      
+        }
+        else {
+            logInfo("heating","To warm, heating is not enabled") 
+            sendCommand(FRITZDECT3011Badezimmer_RadiatorMode,'OFF')   
+            sendCommand(Heating_ToWarm,ON)  
+        }
+    }
+    else {
+        logInfo("heating","Heating Off send") 
+        sendCommand(FRITZDECT3011Badezimmer_RadiatorMode,'OFF')    
+        sendCommand(Heating_ToWarm,OFF)          
+     }
+
+end
+
+// ***************** Badezimmer 120  ****************************************************************************************************
+rule "Heating Badezimmer 120min"
+when  Item Heating_Badezimmer_Comfort_120min received update 
+then
+    logInfo("heating","Heating_Badezimmer_Comfort_120min")    
+
+   if (Heating_Badezimmer_Comfort_120min.state==ON) {
+        logInfo("heating","Heating ON send") 
+        logInfo("heating",localCurrentTemperature.toString) 
+        logInfo("heating",localCurrentTemperature_2h.toString) 
+
+        if (localCurrentTemperature_2h.state<12|°C) {
+            logInfo("heating","Cold enough, enable heating") 
+            sendCommand(FRITZDECT3011Badezimmer_RadiatorMode,'COMFORT')               
+            sendCommand(Heating_ToWarm,OFF)                                  
+      
+       }
+        else {
+            logInfo("heating","To warm, heating is not enabled") 
+            sendCommand(FRITZDECT3011Badezimmer_RadiatorMode,'OFF')  
+            sendCommand(Heating_ToWarm,ON)  
+        }
+
+    } else {
+        logInfo("heating","Heating Off send") 
+        sendCommand(FRITZDECT3011Badezimmer_RadiatorMode,'OFF')    
+        sendCommand(Heating_ToWarm,OFF)          
+    }
+
+end
+
+
+rule "Heating Badezimmer enabled"
+when Item FRITZDECT3011Badezimmer_RadiatorMode changed
+then
+    if (FRITZDECT3011Badezimmer_RadiatorMode.state=='COMFORT') {
+        createTimer(now.plusMinutes(60))[|
+            logInfo("Badezimmer_heizung", "Max for 2 hours")    
+            Heating_Badezimmer_Comfort_120min.sendCommand(OFF)  
+            Heating_Badezimmer_Comfort.postUpdate(OFF)         
+        ]   
+    }
+end
+
 // ************** Chron *****************************************
 // Second, Minutes, Hours, day-of-month, month, day of week, year
 // ? is any value for day of month, day of week
@@ -121,6 +198,7 @@ when
 	Time cron "0 0 23-01 1/1 * ? *"
 then
             Heating_Arbeitszimmer_Comfort.sendCommand(OFF)
+            logInfo("heating","Heating off - better go to sleep now!") 
 end
 
 /* rule "Heating Arbeitszimmer- Workday with Homeoffice "
@@ -140,7 +218,7 @@ end */
 
 rule "Heating - Weekend Warm Mode - Switch to COMFORT all day"
 when
-	Time cron "0 0 10 ? * SAT,SUN *"
+	Time cron "0 0 11 ? * SAT,SUN *"
 then
     if(CNOut.state==ON) {
         logInfo("heating","Heating remains off - ABSENCE MODE") 
@@ -212,7 +290,7 @@ end
 
 rule "Heating Kitchen - Good Morning on Weekend"
 when
-	 Time cron "0 15 8 ? * SAT,SUN *"
+	 Time cron "0 45 8 ? * SAT,SUN *"
 then
     if (CNOut.state==OFF) {
         logInfo("heating","Good Morning - on Weekend") 
@@ -223,7 +301,7 @@ end
 
 rule "Heating Kitchen - Lunch!"
 when
-		Time cron "0 45 11 1/1 * ? *"
+		Time cron "0 00 12 1/1 * ? *"
 then
     if (CNOut.state==OFF) {
         logInfo("heating","Lunch with Christian at home") 
@@ -234,7 +312,7 @@ then
 
 rule "Heating Kitchen - Dinner"
 when
-		Time cron "0 30 17 1/1 * ? *"
+		Time cron "0 00 18 1/1 * ? *"
 then
     if ((CNOut.state==OFF) || (ANOut.state==OFF))  {
         logInfo("heating","Dinner with Christian or Anne at home") 

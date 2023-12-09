@@ -1,0 +1,24 @@
+
+Strategies {
+    every5Seconds : "0/5 * * * * ?"
+    every5Minutes : "0 */5 * * * ?"
+    everyMinute : "0 * * * * ?"
+    everyHour   : "0 0 * * * ?"
+    everyDay    : "0 0 0 * * ?"
+    default = everyChange
+}
+
+Items {
+    // Persist all items on every change and every minute
+    arbeitszimmer_toggle,
+    Temperature_Draussen_sonoff,
+    Temperature_Arbeitszimmer_sonoff,
+    FRITZDECT3011Arbeitszimmer_Temperature,
+    FRITZDECT3011Arbeitszimmer_ActualTemp,
+    FRITZDECT3011Arbeitszimmer_SetTemp,
+    FRITZDECT3011Arbeitszimmer_RadiatorMode,
+    localCurrentTemperature,
+    localCurrentTemperature_2h,
+    CNOut
+     : strategy = everyMinute
+}

@@ -1,0 +1,197 @@
+config:
+  label: Overview
+blocks:
+  - component: oh-block
+    config:
+      titel: Absence
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-label-card
+                config:
+                  item: CNOut
+                  title: Christian Out
+              - component: oh-label-card
+                config:
+                  item: ANOut
+                  title: Anne Out
+  - component: oh-block
+    config:
+      title: Licht Arbeitszimmer
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-toggle-card
+                config:
+                  item: arbeitszimmer_toggle
+                  title: Licht Arbeitszimmer - Deckenlampe
+              - component: oh-toggle-card
+                config:
+                  item: Sonoff1
+                  title: Licht Arbeitszimmer - Stehlampe
+              - component: oh-toggle-card
+                config:
+                  item: Sonoff4
+                  title: Musik Arbeitszimmer
+  - component: oh-block
+    config:
+      title: Licht Küche
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-toggle-card
+                config:
+                  item: Sonoff_Smart_1
+                  title: Licht Kueche - Fensterbank
+              - component: oh-toggle-card
+                config:
+                  item: Ambient_Kueche_Toggle
+                  title: Licht Küche - Deckenlampe
+              - component: oh-toggle-card
+                config:
+                  item: Conbee_Coffe_Kitchen_Brightness
+                  title: Licht Coffee
+  - component: oh-block
+    config:
+      title: Licht Wohnzimmer
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-toggle-card
+                config:
+                  item: Ikea_Stimmung_Toggle
+                  title: Wohnzimmer Klar Decke
+              - component: oh-toggle-card
+                config:
+                  item: Sonoff3
+                  title: Wohzimmer Stehlampe
+  - component: oh-block
+    config:
+      title: Küche
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-label-card
+                config:
+                  item: FRITZDECT3011Kueche_ActualTemp
+                  title: Temperatur Küche
+                  trendItem: FRITZDECT3011Kueche_ActualTemp
+              - component: oh-toggle-card
+                config:
+                  item: Heating_Kueche_Comfort
+                  title: Heizung Kueche
+              - component: oh-toggle-card
+                config:
+                  item: Heating_Kueche_Comfort_120min
+                  title: Heizung Kueche - 120min
+              - component: oh-toggle-card
+                config:
+                  item: Conbee_PlugOnOff_Kitchen_Coffee
+                  title: KaffeeMaschiene
+  - component: oh-block
+    config:
+      title: Arbeitszimmer
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-label-card
+                config:
+                  item: FRITZDECT3011Arbeitszimmer_ActualTemp
+                  title: Temperatur Arbeitszimmer
+                  trendItem: FRITZDECT3011Arbeitszimmer_ActualTemp
+              - component: oh-toggle-card
+                config:
+                  item: Heating_Arbeitszimmer_Comfort
+                  title: Heizung Arbeitszimmer
+              - component: oh-label-card
+                config:
+                  item: Temperature_Arbeitszimmer_sonoff
+                  title: Temperature Arbeitszimmer
+                  trendItem: Temperature_Arbeitszimmer_sonoff
+              - component: oh-label-card
+                config:
+                  item: Temperature_Draussen_sonoff
+                  title: Temperature Draussen
+                  trendItem: Temperature_Draussen_sonoff
+              - component: oh-label-card
+                config:
+                  item: localCurrentTemperature
+                  title: Temperature Draussen (API)
+              - component: oh-label-card
+                config:
+                  item: localCurrentTemperature_2h
+                  title: Temperature Draussen +2h (API)
+  - component: oh-block
+    config:
+      title: Heizung Badezimmmer
+    slots:
+      default:
+        - component: oh-grid-cells
+          config: {}
+          slots:
+            default:
+              - component: oh-label-card
+                config:
+                  item: FRITZDECT3011Badezimmer_ActualTemp
+                  title: Temperatur Badezimmer
+                  trendItem: FRITZDECT3011Badezimmer_ActualTemp
+              - component: oh-toggle-card
+                config:
+                  title: Heizung Badezimmer
+                  item: Heating_Badezimmer_Comfort_120min
+masonry:
+  - component: oh-masonry
+    slots:
+      default:
+        - component: oh-list-card
+          config: {}
+          slots:
+            default:
+              - component: oh-label-item
+                config:
+                  item: arbeitszimmer_toggle
+                  title: Arbeitszimmer - Decke
+              - component: oh-label-item
+                config:
+                  item: Sonoff1
+                  title: Arbeitszimmer - Stehlampe
+              - component: oh-label-item
+                config:
+                  item: Sonoff4
+                  title: Arbeitszimmer - Musik
+              - component: oh-label-item
+                config:
+                  item: Ambient_Kueche_Toggle
+                  title: Küche - Decke
+              - component: oh-label-item
+                config:
+                  item: Sonoff_Smart_1
+                  title: Küche - Fensterbank
+              - component: oh-label-item
+                config:
+                  item: Ikea_Stimmung_Toggle
+                  title: Wohnzimmer - Decke
+              - component: oh-label-item
+                config:
+                  item: Sonoff3
+                  title: Wohnzimmer - Stehlampe
+grid: null
+canvas: null
