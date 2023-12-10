@@ -47,6 +47,9 @@ Number:Temperature      Temperature_Draussen_sonoff "Draussen [%.1f °C]"   <tem
 Number:Dimensionless    Humidity_Arbeitszimmer_sonoff "Humidity Arbeitszimmer [%.1f %%]"      <humidity>      { channel="deconz:humiditysensor:homeserver:3c2ef5fffebd43dc010405:humidity" }
 Number:Dimensionless    Humidity_Draussen_sonoff  "Humidity Draussen [%.1f %%]"      <humidity>      { channel="deconz:humiditysensor:homeserver:84ba20fffecf3293010405:humidity" }
 
+Number:Temperature      TargetTemperature_Arbeitszimmer
+
+Switch TestDiff
 
 
 // ****************************************************************************************

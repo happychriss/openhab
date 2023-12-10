@@ -1,4 +1,52 @@
 // ***************** Generic commands for heating *************************************************************************************
+
+
+// Arbeitszimmer
+rule "React on Radiator mode (FRITZDECT3011Arbeitszimmer_RadiatorMode) change/update"
+when
+    Item FRITZDECT3011Arbeitszimmer_RadiatorMode changed to "OFF"
+then
+         if (Heating_Arbeitszimmer_Comfort.state==ON) {
+            logInfo("heating","Manual change to OFF") 
+            Heating_Arbeitszimmer_Comfort.postUpdate(OFF)
+        }
+
+end
+
+rule "React on Radiator mode (FRITZDECT3011Arbeitszimmer_RadiatorMode) change/update"
+when
+    Item FRITZDECT3011Arbeitszimmer_RadiatorMode changed to "COMFORT"
+then
+         if (Heating_Arbeitszimmer_Comfort.state==OFF) {
+            logInfo("heating","Manual change to COMFORT") 
+            Heating_Arbeitszimmer_Comfort.postUpdate(ON)
+        }
+end
+
+// Kueche
+
+rule "React on Radiator mode (FRITZDECT3011Kueche_RadiatorMode) change/update"
+when
+    Item FRITZDECT3011Kueche_RadiatorMode changed to "OFF"
+then
+    if (Heating_Kuech_Comfort.state==ON) {
+            logInfo("heating","Manual change to OFF") 
+            Heating_Kueche_Comfort.postUpdate(OFF)
+        }
+end
+
+rule "React on Radiator mode (FRITZDECT3011Kueche_RadiatorMode) change/update"
+when
+    Item FRITZDECT3011Kueche_RadiatorMode changed to "COMFORT"
+then
+    if (Heating_Kuech_Comfort.state==ON) {
+            logInfo("heating","Manual change to COMFORT") 
+            Heating_Kueche_Comfort.postUpdate(ON)
+        }
+end
+
+
+
 // ***************** Arbeitszimmer ****************************************************************************************************
 
 
@@ -11,12 +59,14 @@ then
 
    logInfo("heating","Heating_Arbeitszimmer_Comfort") 
 
+
     if (Heating_Arbeitszimmer_Comfort.state==ON) {
         logInfo("heating","Heating Arbeitszimmer ON send") 
         logInfo("heating",localCurrentTemperature.toString) 
         logInfo("heating",localCurrentTemperature_2h.toString) 
 
-        if ((localCurrentTemperature.state<16|°C) && (localCurrentTemperature_2h.state<18|°C)) {
+        if ((localCurrentTemperature.state<18|°C) && 
+            (localCurrentTemperature_2h.state<19|°C)) {
             logInfo("heating","Cold enough, enable heating") 
             sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,'COMFORT')  
             sendCommand(Heating_ToWarm,OFF)                      
@@ -187,11 +237,70 @@ then
     }
 end
 
+rule "DiffTest"
+when Item TestDiff changed
+then
+    logInfo("heating","Check Arbeitszimmer Temperature")        
+    if (Heating_Arbeitszimmer_Comfort.state==ON) {
+        logInfo("heating","Welcome (Target/Sonoff/SetTemp/Actual)")
+        logInfo("heating",TargetTemperature_Arbeitszimmer.state.toString)
+        logInfo("heating",Temperature_Arbeitszimmer_sonoff.state.toString)
+        logInfo("heating",FRITZDECT3011Arbeitszimmer_SetTemp.state.toString)
+        logInfo("heating",FRITZDECT3011Arbeitszimmer_ActualTemp.state.toString)
+
+        var difftemp =  (TargetTemperature_Arbeitszimmer.state as QuantityType<Number>).toBigDecimal - (Temperature_Arbeitszimmer_sonoff.state as QuantityType<Number>).toBigDecimal 
+        logInfo("heating","Difference:")        
+        logInfo("heating",difftemp.toString)                
+
+        if (difftemp != null && Math.abs(difftemp.doubleValue()) > 0.2) {
+            var newtemp=(FRITZDECT3011Arbeitszimmer_SetTemp.state as QuantityType<Number>).toBigDecimal+difftemp
+            logInfo("heating","New SetTemp")        
+            logInfo("heating",newtemp.toString)
+            FRITZDECT3011Arbeitszimmer_SetTemp.sendCommand(newtemp)
+        } else {
+            logInfo("heating","No big difference, dont update set-temp")        
+        }
+    }
+    else {
+        logInfo("heating","Nothing to check - not on Comfort !")        
+    }
+end
+
 // ************** Chron *****************************************
 // Second, Minutes, Hours, day-of-month, month, day of week, year
 // ? is any value for day of month, day of week
 
 // ***************** Arbeitszimmer ****************************************************************************************************
+
+
+rule "Arbeitszimmer Heating Check Interval"
+when
+	Time cron "0 0/20 06-23 1/1 * ? *"    
+then
+    logInfo("heating","Check Arbeitszimmer Temperature")        
+    if (Heating_Arbeitszimmer_Comfort.state==ON) {
+        logInfo("heating","Welcome (Sonoff/Heating Set / Heating Actual)")
+        logInfo("heating",Temperature_Arbeitszimmer_sonoff.state.toString)
+        logInfo("heating",FRITZDECT3011Arbeitszimmer_SetTemp.state.toString)
+        logInfo("heating",FRITZDECT3011Arbeitszimmer_ActualTemp.state.toString)
+
+
+        var difftemp =  (TargetTemperature_Arbeitszimmer.state as QuantityType<Number>).toBigDecimal - (Temperature_Arbeitszimmer_sonoff.state as QuantityType<Number>).toBigDecimal 
+        logInfo("heating","Difftemperature")        
+        logInfo("heating",difftemp.toString)                
+        if (difftemp != null && Math.abs(difftemp.doubleValue()) > 0.2) {
+            var newtemp=(FRITZDECT3011Arbeitszimmer_SetTemp.state as QuantityType<Number>).toBigDecimal+difftemp
+            logInfo("heating","New SetTemp")        
+            logInfo("heating",newtemp.toString)
+            FRITZDECT3011Arbeitszimmer_SetTemp.sendCommand(newtemp)
+        } else {
+            logInfo("heating","No big difference, dont update set-temp")        
+        }
+    }
+    else {
+        logInfo("heating","Nothing to check - not on Comfort !")        
+    }
+end
 
 rule "Heating Arbeitszimmer- Night Mode - Switch off at night"
 when

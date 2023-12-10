@@ -8,4 +8,5 @@ then
  sendCommand(AbsenceWifi,OFF)
  sendCommand(SunIsDown,OFF)
  sendCommand(Heating_ToWarm,OFF)
+ TargetTemperature_Arbeitszimmer.state=FRITZDECT3011Arbeitszimmer_ComfortTemp.state
 end
