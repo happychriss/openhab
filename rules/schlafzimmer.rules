@@ -3,7 +3,22 @@ when
     Item Dash_PPT_1 received update ON
 then
     logInfo("amazondashbutton", "My Dash *Schlafzimmer* has been pressed!")
-    sendCommand(Lights,OFF)
-    sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,OFF)
-    sendCommand(AbsenceMode,OFF)
+    if (now.getHour<15) {
+            logInfo("amazondashbutton", "Morning Routine - Get Coffee Ready")
+            sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,ON)            
+            // give it 20min to make the cofee
+            createTimer(now.plusMinutes(38))[|
+                logInfo("CoffeeMachine", "End Timer Coffee-Machine, switch off")    
+                sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
+
+            ] // timer switch off coffee machine again            
+    } else {
+        logInfo("amazondashbutton", "Evening Routine -All off - good night")
+        //sendCommand(Lights,OFF)
+        sendCommand(FRITZDECT3011Arbeitszimmer_RadiatorMode,OFF)
+        Heating_Kueche_Comfort.postUpdate(OFF)
+        sendCommand(AbsenceMode,OFF)
+    }
 end
+
+

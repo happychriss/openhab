@@ -20,5 +20,5 @@ Items {
     localCurrentTemperature,
     localCurrentTemperature_2h,
     CNOut
-     : strategy = everyMinute
+     : strategy = everyHour
 }

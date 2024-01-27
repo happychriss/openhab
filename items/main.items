@@ -28,8 +28,11 @@ Group:Switch:AND(ON,OFF) RandomLight
 // Group Arbeitszimmer
 
 // Deckenleuchte
-Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
-Dimmer	arbeitszimmer_dimmer	               	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
+// Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
+Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
+
+
+// Dimmer	arbeitszimmer_dimmer	               	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
 
 
 // Stehlampe
