@@ -17,7 +17,7 @@ then
                 sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,ON)
 
                 // give it 20min to make the cofee
-                createTimer(now.plusMinutes(38))[|
+                createTimer(now.plusMinutes(50))[|
                     logInfo("CoffeeMachine", "End Timer Coffee-Machine, switch off")    
                     sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
 

@@ -12,7 +12,7 @@ Switch AbsenceMode
 Group Lights_Random
 
 
-// ****************************************************************************************
+// *********************************** *****************************************************
 // Detect Absence and Random Light
 
 Switch ANOut (AbsenceWifi,RandomLight)
@@ -24,13 +24,13 @@ Group:Switch:AND(ON,OFF) AbsenceWifi
 Group:Switch:AND(ON,OFF) RandomLight 
 
 
-// ****************************************************************************************
+// ********** ******************************************************************************
 // Group Arbeitszimmer
 
 // Deckenleuchte
-// Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
-Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
 
+Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
+Dimmer  arbeitszimmer_dimmer    (Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
 
 // Dimmer	arbeitszimmer_dimmer	               	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
 
@@ -54,14 +54,26 @@ Number:Temperature      TargetTemperature_Arbeitszimmer
 
 Switch TestDiff
 
+Number BatteryLevel_Music { channel="deconz:switch:homeserver:tradfri-4:battery_level" }
+Number BatteryLevel_Kueche { channel="deconz:switch:homeserver:oh-kueche:battery_level" }
+Number BatteryLevel_Fensterbank { channel="deconz:switch:homeserver:tradfri-3:battery_level" }
+Number BatteryLevel_Coffee { channel="deconz:switch:homeserver:tradfri-5:battery_level" }
+Number BatteryLevel_Arbeitszimmer { channel="deconz:switch:homeserver:oh-arbeitszimmer:battery_level" }
+Number BatteryLevel_Wohnzimmer { channel="deconz:switch:homeserver:oh-wohnzimmer:battery_level" }
 
 // ****************************************************************************************
 // Group Wohnzimmer
 
 // Deckenleuchte
-Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:brightness" }
-Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:brightness" }
-Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:color_temperature"}
+Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:brightness" }
+// Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:brightness" }
+// Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:color_temperature"}
+
+
+//Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:brightness" }
+//Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:brightness" }
+// Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="deconz:colortemperaturelight:homeserver:90fd9ffffe895fff01:color_temperature"}
+
 
 // Stehlampe 
 // Switch Sonoff3 "StehlampeWohn" <light> (LR,gLight,Lights,Lights_Random) { mqtt="<[sonoff:stat/sonoff3/POWER:state:default], >[sonoff:cmnd/sonoff3/POWER:command:*:default]" }  
@@ -119,3 +131,6 @@ Switch Heating_Badezimmer_Comfort
 Switch Heating_Badezimmer_Comfort_120min
 
 Switch Heating_ToWarm
+// hi hi 
+
+// asdfsafd s dfasdf asdfasfd

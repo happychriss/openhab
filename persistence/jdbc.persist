@@ -2,6 +2,7 @@
 Strategies {
     every5Seconds : "0/5 * * * * ?"
     every5Minutes : "0 */5 * * * ?"
+    every15Minutes : "0 */15 * * * ?"    
     everyMinute : "0 * * * * ?"
     everyHour   : "0 0 * * * ?"
     everyDay    : "0 0 0 * * ?"
@@ -20,5 +21,5 @@ Items {
     localCurrentTemperature,
     localCurrentTemperature_2h,
     CNOut
-     : strategy = everyHour
+     : strategy = every5Minutes
 }

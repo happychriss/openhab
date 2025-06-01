@@ -9,4 +9,9 @@ then
  sendCommand(SunIsDown,OFF)
  sendCommand(Heating_ToWarm,OFF)
  TargetTemperature_Arbeitszimmer.state=FRITZDECT3011Arbeitszimmer_ComfortTemp.state
+ if (cFboxMacOnline_cn.state == NULL) {
+        cFboxMacOnline_cn.postUpdate(OFF) // Set an initial state, e.g., OFF
+		cFboxMacOnline_an.postUpdate(OFF) // Set an initial state, e.g., OFF
+        logInfo("startup", "Initialized cFboxMacOnline_cn to OFF")
+    }
 end

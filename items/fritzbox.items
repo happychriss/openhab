@@ -27,9 +27,6 @@ DateTime             FRITZDECT3011Badezimmer_NextChange     "Next Setpoint Chang
 Number:Temperature   FRITZDECT3011Badezimmer_NextTemp       "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_301:1:099950124754:next_temp"}
 Switch               FRITZDECT3011Badezimmer_BatteryLow     "Low Battery"                 {channel="avmfritz:FRITZ_DECT_301:1:099950124754:battery_low"}
 
-
-
-
 // DECT Heizung Kueche
 String               FRITZDECT3011Kueche_Mode                   "Mode"                        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:mode"}
 Contact              FRITZDECT3011Kueche_Locked                 "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_301:1:099950581490:locked"}
@@ -44,18 +41,12 @@ DateTime             FRITZDECT3011Kueche_NextChange             "Next Setpoint C
 Number:Temperature   FRITZDECT3011Kueche_NextTemp               "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_301:1:099950581490:next_temp"}
 Switch               FRITZDECT3011Kueche_BatteryLow             "Low Battery"                 {channel="avmfritz:FRITZ_DECT_301:1:099950581490:battery_low"}
 
-
-// Anwesenheit
-//Contact cFboxMacOnline_cn      "CN Presence (WiFi) [%s]"      {fritzboxtr064="maconline:8C-B8-4A-5A-69-72" }
-// Contact cFboxMacOnline_an      "AN Presence (WiFi) [%s]"      {fritzboxtr064="maconline:7C-10-C9-0B-8F-80" }
-
                                                             
-// Important - Config for MAC address is also in Fritzbox - Things, also Pixel phone changes its MAC automatically -needs to be disabled                                                                                                                               
-Switch cFboxMacOnline_cn        "CN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_0C_3AC4_3A13_3A32_3A45_3ABC"}
-//Switch cFboxMacOnline_cn        "CN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_8C_3AB8_3A4A_3A5A_3A69_3A72"}
+// Important - Config for MAC address is also in Fritzbox - Things, also Pixel phone changes its MAC automatically -needs to be disabled    
+
+// Switch cFboxMacOnline_cn        "CN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_0C_3AC4_3A13_3A32_3A45_3ABC"} // Pixel7
+Switch cFboxMacOnline_cn        "CN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_34_3AC7_3AE9_3A2A_3ABE_3AC7"} // Pixel 8
 Switch cFboxMacOnline_an        "AN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_7C_3A10_3AC9_3A0B_3A8F_3A80"}
 
-//tr064:subdeviceLan:fritzboxcm:LAN:macOnline_8C_3AB8_3A4A_3A5A_3A69_3A72
-//tr064:subdeviceLan:fritzboxcm:LAN:macOnline_7C_3A10_3AC9_3A0B_3A8F_3A80
-
- 
+// check wifi on fritzbox
+// Number wifi {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_B4_3AFC_3A7D_3A92_3AD4_3A8A"}

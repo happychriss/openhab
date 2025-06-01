@@ -58,10 +58,11 @@ end
 
 
 
-// Arbeitszimmer ********************************************************************************
-rule "Tradfi-Arbeitszimmer -Light"
+// Arbeitszimmer ********************************** **********************************************
+rule "Tradfi-Arbeitszimmer - Light"
 when
-    Channel "deconz:switch:homeserver:oh-arbeit:buttonevent" triggered
+
+    Channel "deconz:switch:homeserver:oh-arbeit-onoff:buttonevent" triggered
 then
     logInfo("tradfi","Tradfi *Arbeitszimmer Licht* has been pressed")
         
