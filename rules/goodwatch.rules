@@ -6,26 +6,26 @@ then
         GoodWatch.state=OFF
         logInfo("GoodWatch","Goodwatch Morning Routine")
 
-        if (now.getHour<10) {
-            Heating_Kueche_Comfort_120min.sendCommand(ON) // only 90min 
-            Heating_Badezimmer_Comfort_120min.sendCommand(ON) // only 90min 
-            logInfo("CoffeeMachine", "Start Coffee-Machine in 20min")        
-            // after 20 min enable the coffee machine
-            createTimer(now.plusMinutes(25))[|
-                logInfo("GoodWatch","Enable Coffee Machine for 20min")
+         if (now.getHour<10) {
+             Heating_Kueche_Comfort_120min.sendCommand(ON) // only 90min 
+             Heating_Badezimmer_Comfort_120min.sendCommand(ON) // only 90min 
+             logInfo("CoffeeMachine", "Start Coffee-Machine in 20min")        
+             // after 20 min enable the coffee machine
+             createTimer(now.plusMinutes(25))[|
+                 logInfo("GoodWatch","Enable Coffee Machine for 20min")
 
-                sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,ON)
+                 sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,ON)
 
-                // give it 20min to make the cofee
-                createTimer(now.plusMinutes(50))[|
-                    logInfo("CoffeeMachine", "End Timer Coffee-Machine, switch off")    
-                    sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
+                 // give it 20min to make the cofee
+                 createTimer(now.plusMinutes(50))[|
+                     logInfo("CoffeeMachine", "End Timer Coffee-Machine, switch off")    
+                     sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
 
-                ] // timer switch off coffee machine again
+                 ] // timer switch off coffee machine again
 
-            ] // tmer enable coffee machine
-        } else {
-            logInfo("GoodWatch", "Skipping Routine, its not morning anymore")    
-        }
+             ] // tmer enable coffee machine
+         } else {
+             logInfo("GoodWatch", "Skipping Routine, its not morning anymore")    
+         }
 
 end

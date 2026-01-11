@@ -43,10 +43,8 @@ Switch               FRITZDECT3011Kueche_BatteryLow             "Low Battery"   
 
                                                             
 // Important - Config for MAC address is also in Fritzbox - Things, also Pixel phone changes its MAC automatically -needs to be disabled    
+// needs to be matching with fritzbox_things channels
+Switch cFboxMacOnline_cn "CN Presence (WiFi) [%s]"                       { channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_34_3AC7_3AE9_3A2A_3ABE_3AC7" }
+Switch cFboxMacOnline_an "AN Presence (WiFi) [%s]"                       { channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_7C_3A10_3AC9_3A0B_3A8F_3A80" }
 
-// Switch cFboxMacOnline_cn        "CN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_0C_3AC4_3A13_3A32_3A45_3ABC"} // Pixel7
-Switch cFboxMacOnline_cn        "CN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_34_3AC7_3AE9_3A2A_3ABE_3AC7"} // Pixel 8
-Switch cFboxMacOnline_an        "AN Presence (WiFi) [%s]"                {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_7C_3A10_3AC9_3A0B_3A8F_3A80"}
 
-// check wifi on fritzbox
-// Number wifi {channel="tr064:subdeviceLan:fritzboxcm:LAN:macOnline_B4_3AFC_3A7D_3A92_3AD4_3A8A"}

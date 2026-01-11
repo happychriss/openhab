@@ -70,9 +70,7 @@ then
 
      logInfo("tradfi", actionName)
      switch(actionName) {
-
-     // Short: Decke
-     // Long: Lampe Fensterbank
+  
 
        case "1002": {  //short press ON - Decke
             sendCommand(arbeitszimmer_toggle,ON)
@@ -85,6 +83,22 @@ then
 
      } 
 
+end
+
+rule "Small Light On"
+when
+    Item schreibtisch_licht received update ON
+then
+    logInfo("small_light","Small light was toggled")
+        arbeitszimmer_small_dimmer.sendCommand(100)
+end
+
+rule "Small Light Off"
+when
+    Item schreibtisch_licht received update OFF
+then
+    logInfo("small_light","Small light was toggled")
+        arbeitszimmer_small_dimmer.sendCommand(0)
 end
 
 
@@ -109,8 +123,6 @@ then
      logInfo("tradfi", actionName)
      switch(actionName) {
 
-     // Short: Decke
-     // Long: Lampe Fensterbank
 
        case "1002": {  //short press ON - Decke
              sendCommand(Sonoff4,ON)

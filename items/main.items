@@ -27,10 +27,19 @@ Group:Switch:AND(ON,OFF) RandomLight
 // ********** ******************************************************************************
 // Group Arbeitszimmer
 
-// Deckenleuchte
+// Deckenleuchte - now via sonoff
 
-Switch	arbeitszimmer_toggle	(Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
-Dimmer  arbeitszimmer_dimmer    (Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
+
+
+Switch	arbeitszimmer_small_toggle	(Lights)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-small:brightness"}
+Dimmer	arbeitszimmer_small_dimmer	(Lights)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-small:brightness"}
+Switch schreibtisch_licht
+
+Switch	arbeitszimmer_toggle	(Lights,Lights_Random) { channel="mqtt:topic:OH2mqtt:smart_switch_2:ch1" }
+
+
+
+// Dimmer  arbeitszimmer_dimmer    (Lights,Lights_Random)	{ channel="deconz:dimmablelight:homeserver:oh-arbeitszimmer-decke:brightness"}
 
 // Dimmer	arbeitszimmer_dimmer	               	{ channel="deconz:dimmablelight:homeserver:b43a31fffe55b2eb01:brightness"}
 
@@ -39,6 +48,7 @@ Dimmer  arbeitszimmer_dimmer    (Lights,Lights_Random)	{ channel="deconz:dimmabl
 // Switch Sonoff1 "Stehlampe" <light> (LR,gLight,Lights,Lights_Random) { mqtt="<[sonoff:stat/sonoff1/POWER:state:default], >[sonoff:cmnd/sonoff1/POWER:command:*:default]" }  
 Switch Sonoff1 "Stehlampe" <light> (LR,gLight,Lights,Lights_Random) ["Switchable"] { channel="mqtt:topic:OH2mqtt:sonoff1:ch1" }
 Switch Sonoff4 "Musik Arbeitzimmer" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:sonoff4:ch1" }
+
 
 // Switch on/off
 Switch SmartSwitch1 //Stehlampe
@@ -58,7 +68,7 @@ Number BatteryLevel_Music { channel="deconz:switch:homeserver:tradfri-4:battery_
 Number BatteryLevel_Kueche { channel="deconz:switch:homeserver:oh-kueche:battery_level" }
 Number BatteryLevel_Fensterbank { channel="deconz:switch:homeserver:tradfri-3:battery_level" }
 Number BatteryLevel_Coffee { channel="deconz:switch:homeserver:tradfri-5:battery_level" }
-Number BatteryLevel_Arbeitszimmer { channel="deconz:switch:homeserver:oh-arbeitszimmer:battery_level" }
+Number BatteryLevel_Arbeitszimmer { channel="deconz:switch:homeserver:oh-arbeit-onoff:battery_level" }
 Number BatteryLevel_Wohnzimmer { channel="deconz:switch:homeserver:oh-wohnzimmer:battery_level" }
 
 // ****************************************************************************************
@@ -66,7 +76,7 @@ Number BatteryLevel_Wohnzimmer { channel="deconz:switch:homeserver:oh-wohnzimmer
 
 // Deckenleuchte
 Switch	Ikea_Stimmung_Toggle	(Lights,Lights_Random)	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:brightness" }
-// Dimmer	Ikea_Stimmung_Dimmer	                    	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:brightness" }
+Dimmer	Ikea_Stimmung_Dimmer	(Lights,Lights_Random) 	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:brightness" }
 // Dimmer	Ikea_Stimmung_ColorTemp	                    	{ channel="deconz:colortemperaturelight:homeserver:oh-wohnzimmer-decke-klar:color_temperature"}
 
 
@@ -96,7 +106,7 @@ Dimmer	Ambient_Kueche_Dimmer	                        {channel="deconz:colortempe
 Switch Sonoff_Smart_1 "Küchenbank" <light> (LR,gLight,Lights) ["Switchable"] { channel="mqtt:topic:OH2mqtt:smart_switch_1:ch1" }
 
 Switch   Conbee_Coffe_Kitchen_Toggle   (Lights)                     {channel="deconz:dimmablelight:homeserver:b43a31fffe555e1101:brightness"}
-Dimmer   Conbee_Coffe_Kitchen_Brightness                            {channel="deconz:dimmablelight:homeserver:b43a31fffe555e1101:brightness"}
+Dimmer   Conbee_Coffe_Kitchen_Brightness (Lights)                           {channel="deconz:dimmablelight:homeserver:b43a31fffe555e1101:brightness"}
 
 // ** Plug on/off swtich 
  Switch Conbee_PlugOnOff_Kitchen_Coffee                                  {channel="deconz:onofflight:homeserver:5c0272fffec8c86c01:switch"}
@@ -119,7 +129,7 @@ Switch  Dash_PPT_1
 Switch  Dash_GBC_2
 
 //************* Heating and Temperature
-Number:Temperature localCurrentTemperature "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:weather-and-forecast:api:local:current#temperature" }
+Number:Temperature localCurrentTemperature "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:current#temperature" }
 Number:Temperature localCurrentTemperature_2h "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:forecastHours02#temperature" }
 
 Switch Heating_Arbeitszimmer_Comfort

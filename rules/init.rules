@@ -8,6 +8,8 @@ then
  sendCommand(AbsenceWifi,OFF)
  sendCommand(SunIsDown,OFF)
  sendCommand(Heating_ToWarm,OFF)
+ sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
+ sendCommand(Lights,OFF)
  TargetTemperature_Arbeitszimmer.state=FRITZDECT3011Arbeitszimmer_ComfortTemp.state
  if (cFboxMacOnline_cn.state == NULL) {
         cFboxMacOnline_cn.postUpdate(OFF) // Set an initial state, e.g., OFF
