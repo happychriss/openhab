@@ -1,29 +1,10 @@
-// Stehlampe ************************************************************
-rule "Dash Wohnzimmer Stehlampe"
-when
-    Item Dash_Nivea received update ON
-then
-    logInfo("amazondashbutton", "My Dash *Wohn-Stehlampe* has been pressed")
-    if(Sonoff3.state == ON)
-    {
-            sendCommand(Sonoff3,OFF)
-    }
-    else {
-            sendCommand(Sonoff3,ON)
-            sendCommand(Ikea_Stimmung_Toggle,OFF) //switch off the decke
-
-    }
-end
-
-
-
 // Wohnzimmer Docke ********************************************************************************
 rule "Tradfi-2 - Wohnzimmer Decke"
 when
     Channel "deconz:switch:homeserver:oh-wohnzimmer:buttonevent" triggered
 then
     logInfo("tradfi","Tradfi *Wohnzimmer Licht* has been pressed")
-        
+
       var actionName = receivedEvent
 
      logInfo("tradfi", actionName)

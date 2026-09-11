@@ -3,12 +3,13 @@ rule "Goodwatch"
 when
 	 Item GoodWatch received command ON
 then
+        // note: sets the state directly, bypassing openHAB's event bus - postUpdate(OFF) would be standard.
+        // kept on purpose (earlier issues)
         GoodWatch.state=OFF
         logInfo("GoodWatch","Goodwatch Morning Routine")
 
          if (now.getHour<10) {
-             Heating_Kueche_Comfort_120min.sendCommand(ON) // only 90min 
-             Heating_Badezimmer_Comfort_120min.sendCommand(ON) // only 90min 
+             // heating incl. weather check: automation/ruby/heating.rb (rule 'Heating GoodWatch')
              logInfo("CoffeeMachine", "Start Coffee-Machine in 20min")        
              // after 20 min enable the coffee machine
              createTimer(now.plusMinutes(25))[|

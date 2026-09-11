@@ -5,3 +5,5 @@ things/hue.things
 things/mqtt.things
 things/weather.things
 workspace.openhab-workspace.code-workspace
+automation/ruby/.gem/
+services/jdbc.cfg

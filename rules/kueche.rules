@@ -1,3 +1,8 @@
+// Timers: pressing ON while a timer runs starts the full time again, OFF switches off and cancels the timer
+var Timer tFensterbank = null     // Sonoff_Smart_1, 70min
+var Timer tCoffeeLight = null     // Conbee_Coffe_Kitchen, 70min
+var Timer tCoffeeMachine = null   // Conbee_PlugOnOff_Kitchen_Coffee, 40min
+
 // ***************************** Decke   *************************************
 rule "Tradfi- Küche Decke"
 when
@@ -24,13 +29,28 @@ logInfo("tradfi", actionName)
         case "1001": { //long press ON  - Fensterbank
              sendCommand(Sonoff_Smart_1,ON)
              sendCommand(Ambient_Kueche_Toggle,OFF)
-             createTimer(now.plusMinutes(70))[ |
-                logInfo("fensterbank", "Start Timer for 70min")    
+             val offAt = now.plusMinutes(70)
+             if (tFensterbank !== null) {
+                 tFensterbank.cancel()
+                 logInfo("fensterbank", "ON again (Decke button) - timer restarted, off at " + offAt.toLocalTime.withNano(0))
+             } else {
+                 logInfo("fensterbank", "ON (Decke button) - timer started, off at " + offAt.toLocalTime.withNano(0))
+             }
+             tFensterbank = createTimer(offAt)[ |
+                logInfo("fensterbank", "70min timer ended - off")
                 sendCommand(Sonoff_Smart_1,OFF)
+                tFensterbank = null
             ]
         }
 
         case "2001": { //long press OFF - Fensterbank
+             if (tFensterbank !== null) {
+                 tFensterbank.cancel()
+                 tFensterbank = null
+                 logInfo("fensterbank", "OFF (Decke button) - timer cancelled")
+             } else {
+                 logInfo("fensterbank", "OFF (Decke button) - no timer running")
+             }
              sendCommand(Sonoff_Smart_1,OFF)
         }
     }
@@ -57,24 +77,39 @@ logInfo("tradfi", actionName)
 
       case "1002": {  //short press ON - Lampe Fensterbank
             sendCommand(Ambient_Kueche_Dimmer,OFF)
-            sendCommand(Ikea_Stimmung_Toggle,OFF) //switch off the decke in wohnzimmer             
+            sendCommand(Ikea_Stimmung_Toggle,OFF) //switch off the decke in wohnzimmer
             sendCommand(Sonoff_Smart_1,ON)
-            createTimer(now.plusMinutes(70))[|
-                logInfo("fensterbank", "Start Timer for 70min")    
+            val offAt = now.plusMinutes(70)
+            if (tFensterbank !== null) {
+                tFensterbank.cancel()
+                logInfo("fensterbank", "ON again (Fensterbank button) - timer restarted, off at " + offAt.toLocalTime.withNano(0))
+            } else {
+                logInfo("fensterbank", "ON (Fensterbank button) - timer started, off at " + offAt.toLocalTime.withNano(0))
+            }
+            tFensterbank = createTimer(offAt)[|
+                logInfo("fensterbank", "70min timer ended - off")
                 sendCommand(Sonoff_Smart_1,OFF)
-
+                tFensterbank = null
             ]
         }
         case "2002": { //short press OFF - Lampe Fensterbank
+                if (tFensterbank !== null) {
+                    tFensterbank.cancel()
+                    tFensterbank = null
+                    logInfo("fensterbank", "OFF (Fensterbank button) - timer cancelled")
+                } else {
+                    logInfo("fensterbank", "OFF (Fensterbank button) - no timer running")
+                }
                 sendCommand(Sonoff_Smart_1,OFF)
+                // intended: light off also switches the kitchen heating off
                 Heating_Kueche_Comfort.sendCommand(OFF)
         }
 
-        case "1001": { //long press ON - 
+        case "1001": { //long press ON -
                 logInfo("tradfi","Tradfi-3 pressed long ON")
         }
 
-        case "2001": { //long press OFF - 
+        case "2001": { //long press OFF -
                 logInfo("tradfi","Tradfi-3 pressed long OFF")
         }
     }
@@ -98,33 +133,62 @@ logInfo("tradfi", actionName)
 
     // Short: Decke
 
-        
+
         case "1002": {  //short press ON - EnableLight
             sendCommand(Conbee_Coffe_Kitchen_Toggle ,ON)
             sendCommand(Conbee_Coffe_Kitchen_Brightness,50)
-            createTimer(now.plusMinutes(70))[|
-                logInfo("Coffee Light", "Start Timer for 70min")    
+            val offAt = now.plusMinutes(70)
+            if (tCoffeeLight !== null) {
+                tCoffeeLight.cancel()
+                logInfo("Coffee Light", "ON again - timer restarted, off at " + offAt.toLocalTime.withNano(0))
+            } else {
+                logInfo("Coffee Light", "ON - timer started, off at " + offAt.toLocalTime.withNano(0))
+            }
+            tCoffeeLight = createTimer(offAt)[|
+                logInfo("Coffee Light", "70min timer ended - off")
                 sendCommand(Conbee_Coffe_Kitchen_Brightness,0)
                 sendCommand(Conbee_Coffe_Kitchen_Toggle,OFF)
-
+                tCoffeeLight = null
                 ]
             }
 
 
         case "2002": { //short press OFF - Lampe Fensterbank
+            if (tCoffeeLight !== null) {
+                tCoffeeLight.cancel()
+                tCoffeeLight = null
+                logInfo("Coffee Light", "OFF - timer cancelled")
+            } else {
+                logInfo("Coffee Light", "OFF - no timer running")
+            }
             sendCommand(Conbee_Coffe_Kitchen_Brightness,0)
             sendCommand(Conbee_Coffe_Kitchen_Toggle ,OFF)
         }
 
         case "1001": {//long press ON - Kaffeemaschine
             sendCommand(Conbee_PlugOnOff_Kitchen_Coffee ,ON)
-            createTimer(now.plusMinutes(40))[|
-                logInfo("CoffeeMachine", "Start Timer for 40min")    
+            val offAt = now.plusMinutes(40)
+            if (tCoffeeMachine !== null) {
+                tCoffeeMachine.cancel()
+                logInfo("CoffeeMachine", "ON again - timer restarted, off at " + offAt.toLocalTime.withNano(0))
+            } else {
+                logInfo("CoffeeMachine", "ON - timer started, off at " + offAt.toLocalTime.withNano(0))
+            }
+            tCoffeeMachine = createTimer(offAt)[|
+                logInfo("CoffeeMachine", "40min timer ended - off")
                 sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
+                tCoffeeMachine = null
             ]
         }
 
         case "2001": {//long press OFF - Kaffeemanschine
+            if (tCoffeeMachine !== null) {
+                tCoffeeMachine.cancel()
+                tCoffeeMachine = null
+                logInfo("CoffeeMachine", "OFF - timer cancelled")
+            } else {
+                logInfo("CoffeeMachine", "OFF - no timer running")
+            }
             sendCommand(Conbee_PlugOnOff_Kitchen_Coffee ,OFF)
         }
 

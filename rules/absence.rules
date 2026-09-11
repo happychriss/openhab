@@ -1,29 +1,31 @@
 var Timer tRandomLights = null
-var Number NightActive = 0
+// astro sun phases between civil dusk and civil dawn
+val darkPhases = newArrayList("CIVIL_DUSK", "NAUTIC_DUSK", "ASTRO_DUSK", "NIGHT", "MIDNIGHT", "ASTRO_DAWN", "NAUTIC_DAWN")
 
 /// *******  when its time to have some light on
 
-rule "SetNight"
-when  Channel 'astro:sun:home:civilDusk#event' triggered START
+// SunIsDown ON from civil dusk until 23:20 (see below), OFF otherwise.
+// From the astro sun phase, so it is also right after a restart or file reload.
+rule "Sun Down from astro phase"
+when
+    Item Sun_Phase changed or
+    System started
 then
-    logInfo("absence_rule", "Astro - Sun Down (civlDusk")    
-	sendCommand(SunIsDown,ON)
-    NightActive=1 
-end
-
-rule "SetDay"
-when Channel 'astro:sun:home:civilDawn#event' triggered START
-then
-    logInfo("absence_rule", "Astro - Sun Up (civlDawn")    
-    NightActive=0 
-	sendCommand(SunIsDown,OFF)
+    if (Sun_Phase.state == NULL || Sun_Phase.state == UNDEF) return;
+    val dark = darkPhases.contains(Sun_Phase.state.toString)
+    val beforeLightsOff = now.getHour >= 12 && (now.getHour < 23 || (now.getHour == 23 && now.getMinute < 20))
+    val newState = if (dark && beforeLightsOff) ON else OFF
+    if (SunIsDown.state != newState) {
+        logInfo("absence_rule", "Astro - sun phase " + Sun_Phase.state + " -> SunIsDown " + newState)
+        sendCommand(SunIsDown, newState)
+    }
 end
 
 rule "Turn all lights off at 23.20 if alarm is activated"
 when Time cron "0 20 23 * * ?"
 then
-	logInfo("absence_rule", "After Eleven - finisht the light show")    
-	// Clear all lights 
+	logInfo("absence_rule", "After Eleven - finisht the light show")
+	// Clear all lights
 	sendCommand(SunIsDown,OFF) // will trigger RandomLight to go off
 
 end
@@ -46,50 +48,27 @@ then
 end
 
 
-rule "DASH Nerf"
-when
-    Item Dash_Nerf received update ON
-then
-    logInfo("amazondashbutton", "My Dash *Alarm On* has been pressed")
-    if(AbsenceMode.state == ON)
-    {
-        sendCommand(AbsenceMode,OFF)
-		
-		// Welcome, enable kitchen light
-		sendCommand(Ambient_Kueche_Toggle,ON)
-
-    }
-    else {
-        sendCommand(AbsenceMode,ON)
-
-		// Goodbye, Indicate that its enabled
-		sendCommand(Ambient_Kueche_Toggle,ON)
-		tRandomLights = createTimer(now.plusSeconds(10)) [|
-			sendCommand(Ambient_Kueche_Toggle,OFF)
-		]
-    }
-end
-
-
 // ******************   Nobody at home, switch all off and welcome when back
+// only real ON <-> OFF changes (not NULL -> OFF at startup)
 
 rule "Absence Alarm ON"
 when
-    Item AbsenceMode changed
+    Item AbsenceMode changed from OFF to ON or
+    Item AbsenceMode changed from ON to OFF
 then
   if(AbsenceMode.state == ON)
   {
-	logInfo("absence_rule", "Alarm Mode was enabled")    
+	logInfo("absence_rule", "Alarm Mode was enabled")
 	Heating_Arbeitszimmer_Comfort.sendCommand(OFF)
     Heating_Kueche_Comfort.sendCommand(OFF)
 	sendCommand(Sonoff4,OFF) // no music needed
 	sendCommand(Lights,OFF)
-  } else  
+  } else
   {
-	logInfo("absence_rule", "Alarm Mode was disabled")      
+	logInfo("absence_rule", "Alarm Mode was disabled")
 
-	if (NightActive==1) {
-		logInfo("absence_rule", "Coming home and its dark - welcome light in the kitchen")      
+	if (darkPhases.contains(Sun_Phase.state.toString)) {
+		logInfo("absence_rule", "Coming home and its dark - welcome light in the kitchen")
 		createTimer(now.plusSeconds(5)) [
         sendCommand(Ambient_Kueche_Toggle,ON)
 		]
@@ -98,44 +77,45 @@ then
   }
 end
 
-// ***** Trigger Random Lighs in case of absence 
+// ***** Trigger Random Lighs in case of absence
 
 rule "Random Light when Anne&Christian are out and Sun is down - ENABLE"
 when
 	Item RandomLight changed to ON
 	// Time cron "0 */15 6-8,15-23 * * ?"
 then
-	logInfo("absence_rule", "Absence - Random Light Setting Active")    
+	logInfo("absence_rule", "Absence - Random Light Setting Active")
 	// Create a timer with a random value
 
 	Lights_Random.members.forEach [s | logInfo("absence_rule", s.name + " equals " + s.state.toString)]
 
 	var int randomTime = (new java.util.Random).nextInt(600)
 	logInfo("org.openhab","Setting random lights timer to " + randomTime + " seconds.")
-	
+
 	tRandomLights = createTimer(now.plusSeconds(randomTime)) [|
 		var randLightIndex = (new java.util.Random).nextInt(Lights_Random.members.size)
 		var randLightStateCurrent = Lights_Random.members.get(randLightIndex).state
 		var randLightStateNew = if (randLightStateCurrent == ON) OFF else ON
 		logInfo("org.openhab","Switching light " + Lights_Random.members.get(randLightIndex).name + " from " + randLightStateCurrent + " to " + randLightStateNew)
 		sendCommand(Lights_Random.members.get(randLightIndex), randLightStateNew)
-		var int randomTime2 = (new java.util.Random).nextInt(600)					 
-		tRandomLights.reschedule(now.plusSeconds(randomTime2)) 
+		var int randomTime2 = (new java.util.Random).nextInt(600)
+		tRandomLights.reschedule(now.plusSeconds(randomTime2))
 	]
 end
 
+// only a real ON -> OFF (not NULL -> OFF at startup, which switched off all lights)
 rule "Random Light when Anne&Christian are out and Sun is down - DISABLE"
 when
-	Item RandomLight changed to OFF //
+	Item RandomLight changed from ON to OFF
 then
-	logInfo("absence_rule", "Absence - Random Light Setting Disable")    
+	logInfo("absence_rule", "Absence - Random Light Setting Disable")
 	if(tRandomLights !== null) {
 		tRandomLights.cancel()
 		tRandomLights = null
 	}
-	// Clear all lights 
+	// Clear all lights
 	sendCommand(Lights_Random,OFF)
-  
+
 end
 
 

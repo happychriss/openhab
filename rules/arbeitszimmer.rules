@@ -1,18 +1,22 @@
 
+// SmartSwitch1/2: self-built device, sends REST commands to both items at once.
+// Triggers are "received command" (not "received update"), so restoring saved states
+// at startup does not switch the lights.
+
 // Deckenlampe  Smart Switch  ************************************************************
 rule "SmartSwitch1 Arbeitszimmer Stehlampe ON"
 when
-    Item SmartSwitch2 received update ON
+    Item SmartSwitch2 received command ON
 then
-    logInfo("Arbeitszimmer - Sonoff1 Stehlampe", "SW-2 Pressed: OFF") 
+    logInfo("Arbeitszimmer - Sonoff1 Stehlampe", "SW-2 Pressed: OFF")
     sendCommand(Sonoff1,OFF)
 end
 
 rule "SmartSwitch1 Arbeitszimmer Stehlampe OFF"
 when
-    Item SmartSwitch2 received update OFF
+    Item SmartSwitch2 received command OFF
 then
-    logInfo("Arbeitszimmer - Sonoff1 Stehlampe", "SW-2 Pressed: ON") 
+    logInfo("Arbeitszimmer - Sonoff1 Stehlampe", "SW-2 Pressed: ON")
     sendCommand(Sonoff1,ON)
 end
 
@@ -21,39 +25,18 @@ end
 
 rule "SmartSwitch2 Arbeitszimmer Deckenlampe ON"
 when
-    Item SmartSwitch1 received update ON
+    Item SmartSwitch1 received command ON
 then
-    logInfo("Arbeitszimmer - Deckenlampe", "SW-2 Pressed: OFF") 
+    logInfo("Arbeitszimmer - Deckenlampe", "SW-2 Pressed: OFF")
     sendCommand(arbeitszimmer_toggle,OFF)
 end
 
 rule "SmartSwitch2 Arbeitszimmer Deckenlampe OFF"
 when
-    Item SmartSwitch1 received update OFF
+    Item SmartSwitch1 received command OFF
 then
-    logInfo("Arbeitszimmer - Deckenlampe", "SW-2 Pressed: ON") 
+    logInfo("Arbeitszimmer - Deckenlampe", "SW-2 Pressed: ON")
     sendCommand(arbeitszimmer_toggle,ON)
-end
-
-// All Lights On/OFF Arbeitzimmer Dash-Button *****************************************************
-
-
-rule "DASH Arbeitszimmer"
-when
-  Item Dash_GBC_2 received update ON or
-  Item Dash_PPT_2 received update ON
-
-then
-    logInfo("amazondashbutton", "My Dash *Arbeit-All* has been pressed!")
-    if(arbeitszimmer_toggle.state == ON)
-    {
-            sendCommand(arbeitszimmer_toggle,OFF)
-            sendCommand(Sonoff1,OFF)
-    }
-    else {
-            sendCommand(arbeitszimmer_toggle,ON)
-            sendCommand(Sonoff1,ON)
-    }
 end
 
 
@@ -65,12 +48,12 @@ when
     Channel "deconz:switch:homeserver:oh-arbeit-onoff:buttonevent" triggered
 then
     logInfo("tradfi","Tradfi *Arbeitszimmer Licht* has been pressed")
-        
+
       var actionName = receivedEvent
 
      logInfo("tradfi", actionName)
      switch(actionName) {
-  
+
 
        case "1002": {  //short press ON - Decke
             sendCommand(arbeitszimmer_toggle,ON)
@@ -81,13 +64,13 @@ then
             sendCommand(Sonoff1,OFF)
          }
 
-     } 
+     }
 
 end
 
 rule "Small Light On"
 when
-    Item schreibtisch_licht received update ON
+    Item schreibtisch_licht received command ON
 then
     logInfo("small_light","Small light was toggled")
         arbeitszimmer_small_dimmer.sendCommand(100)
@@ -95,7 +78,7 @@ end
 
 rule "Small Light Off"
 when
-    Item schreibtisch_licht received update OFF
+    Item schreibtisch_licht received command OFF
 then
     logInfo("small_light","Small light was toggled")
         arbeitszimmer_small_dimmer.sendCommand(0)
@@ -117,7 +100,7 @@ when
     Channel "deconz:switch:homeserver:tradfri-4:buttonevent" triggered
 then
     logInfo("tradfi","Tradfi-4 *Arbeitszimmer Music* has been pressed")
-        
+
       var actionName = receivedEvent
 
      logInfo("tradfi", actionName)
@@ -132,7 +115,7 @@ then
               sendCommand(Sonoff4,OFF)
          }
 
-     } 
+     }
 
 end
 

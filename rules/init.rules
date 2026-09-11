@@ -1,19 +1,14 @@
+// Runs at startup - and again whenever openHAB reloads items/rules files.
+// So only fill items that have no value yet; never switch things that already have a state.
+// SunIsDown: set from astro sun phase (absence.rules)
 rule "Init"
 when
 	System started
 then
- sendCommand(AbsenceMode,OFF)
- sendCommand(CNOut,OFF)
- sendCommand(ANOut,OFF)
- sendCommand(AbsenceWifi,OFF)
- sendCommand(SunIsDown,OFF)
- sendCommand(Heating_ToWarm,OFF)
+ if (AbsenceMode.state == NULL) sendCommand(AbsenceMode,OFF)
+ // at startup: I am home
+ if (CNOut.state == NULL) sendCommand(CNOut,OFF)
+ if (ANOut.state == NULL) sendCommand(ANOut,OFF)
+ // coffee machine: its off-timer is lost on restart -> switch off for safety
  sendCommand(Conbee_PlugOnOff_Kitchen_Coffee,OFF)
- sendCommand(Lights,OFF)
- TargetTemperature_Arbeitszimmer.state=FRITZDECT3011Arbeitszimmer_ComfortTemp.state
- if (cFboxMacOnline_cn.state == NULL) {
-        cFboxMacOnline_cn.postUpdate(OFF) // Set an initial state, e.g., OFF
-		cFboxMacOnline_an.postUpdate(OFF) // Set an initial state, e.g., OFF
-        logInfo("startup", "Initialized cFboxMacOnline_cn to OFF")
-    }
 end

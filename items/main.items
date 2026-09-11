@@ -18,6 +18,8 @@ Group Lights_Random
 Switch ANOut (AbsenceWifi,RandomLight)
 Switch CNOut (AbsenceWifi,RandomLight)
 Switch SunIsDown (RandomLight)
+// astro sun phase (CIVIL_DUSK, NIGHT, ...), sets SunIsDown in absence.rules
+String Sun_Phase "Sun phase [%s]" { channel="astro:sun:home:phase#name" }
 
 //switch is set to "on" if ANOut and CNOut are set to ON
 Group:Switch:AND(ON,OFF) AbsenceWifi 
@@ -90,10 +92,6 @@ Dimmer	Ikea_Stimmung_Dimmer	(Lights,Lights_Random) 	{ channel="deconz:colortempe
 
 Switch Sonoff3 "StehlampeWohn" <light> (LR,gLight,Lights,Lights_Random) ["Switchable"] { channel="mqtt:topic:OH2mqtt:sonoff3:ch1" }
 
-// Switch on/off
-Switch Dash_Nivea //Stehlampe
-Switch Dash_GBC_1 //Deckenlamp - not used anymore, stopped working
-Switch Dash_PPT_2 //Deckenlampe
 
 // ****************************************************************************************
 // Group Kueche 
@@ -111,26 +109,16 @@ Dimmer   Conbee_Coffe_Kitchen_Brightness (Lights)                           {cha
 // ** Plug on/off swtich 
  Switch Conbee_PlugOnOff_Kitchen_Coffee                                  {channel="deconz:onofflight:homeserver:5c0272fffec8c86c01:switch"}
 
-// Switch on/off
-Switch  Dash_Purina
 
 Switch GoodWatch
 
-// *****************************************************************************************
-// *** Enable Alarm
-Switch  Dash_Nerf
 
-// ****************************************************************************************
-// Group Schlafzimmer - all light off
-Switch  Dash_PPT_1
 
-// ****************************************************************************************
-// DASH unassigned
-Switch  Dash_GBC_2
 
 //************* Heating and Temperature
 Number:Temperature localCurrentTemperature "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:current#temperature" }
 Number:Temperature localCurrentTemperature_2h "Current temperature [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:forecastHours02#temperature" }
+Number:Temperature localTodayMaxTemperature "Max temperature today [%.1f %unit%]" <temperature> { channel="openweathermap:onecall:api:local:forecastToday#max-temperature" }
 
 Switch Heating_Arbeitszimmer_Comfort
 
@@ -141,6 +129,9 @@ Switch Heating_Badezimmer_Comfort
 Switch Heating_Badezimmer_Comfort_120min
 
 Switch Heating_ToWarm
+// morning weather check: no heating when outside reaches these (set via UI)
+Number:Temperature Heating_StopTemp_Now "Heating stop - outside now [%.1f %unit%]" <temperature>
+Number:Temperature Heating_StopTemp_2h "Heating stop - outside in 2h [%.1f %unit%]" <temperature>
 // hi hi 
 
 // asdfsafd s dfasdf asdfasfd
