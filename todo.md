@@ -74,7 +74,8 @@ Results, so the next session does not repeat the work:
       `services/runtime.cfg.dpkg-old` (packaging backup, see section 3) and
       `sounds/doorbell.mp3` (unexplained binary change). Both are unrelated to heating;
       neither contains secrets — the dpkg-old diff was checked line by line.
-- [ ] Revoke the `claudebot` / `claudebot2` API tokens.
+- [ ] Revoke the `claudebot` / `claudebot2` API tokens — see section 9 for what they actually
+      grant, and for the two bigger findings next to them.
 - [ ] `things/fritzbox.things:11` still declares the 302 as a `FRITZ_DECT_301` (section 2) —
       deliberately untouched; the file declares a different thing UID than the live JSONDB thing,
       so "fixing" it could re-provision the Arbeitszimmer valve. Needs its own analysis.
@@ -274,6 +275,51 @@ seeing the heating on when it is warm outside. These are the agreed reconciliati
   in `Heating_<Room>_Target` it could be made presence-dependent if the arguing continues.
 - [ ] `RadiatorMode` will now read `ON` rather than `COMFORT` whenever the target differs
       from the device's stored `komfort`. Cosmetic, but `jdbc.persist` records it.
+
+## 9. REST API exposure — ANALYSED 2026-09-12, mostly NOT about the tokens
+
+Asked "why revoke, where is the risk?". Answer, so it is not re-derived:
+
+**The tokens are not leaked.** Never tracked in git — `claudebot` appears nowhere outside this
+file. `~/.config/openhab/claudebot2.token` is `0600`, owned by cneuhaus, outside the repo.
+Do not repeat the earlier framing that linked them to the repo being public; there is no link.
+
+**What the token grants.** Probed live on 2026-09-12 (openHAB 5.2.1):
+
+```
+/rest/items        200   <- NO AUTH REQUIRED
+/rest/things       401
+/rest/rules        401
+/rest/inbox        401
+/rest/persistence  401
+```
+
+`org.openhab.restauth:implicitUserRole` is commented out in `services/runtime.cfg:221`, so it
+defaults to **enabled**: any unauthenticated request gets the implicit `user` role. Anyone who can
+reach :8080 can already read and command **every item** — heating, lights — with no token.
+
+So the token buys only the admin half. That half includes `POST /rest/rules`, and openHAB rules are
+scripts executed in the openHAB JVM ⇒ an admin token is effectively **arbitrary code execution as
+the `openhab` user**. That, not "someone turns the radiator on", is the token's blast radius.
+
+- [ ] Revoke both tokens — they were minted for one job (editing the Heating page over REST on
+      2026-09-12) which is finished. No expiry, no owner.
+- [ ] Delete `~/.config/openhab/claudebot2.token` **and** `~/.config/openhab/.claudebot.token.swp`
+      — the latter is a vim swap file holding a copy of the first, malformed token. It will not be
+      caught by "delete the .token files".
+
+### The two findings that matter more than the tokens
+
+- [ ] **`implicitUserRole` is on (default).** Unauthenticated item read+command from anywhere that
+      can reach the port. Consider setting `org.openhab.restauth:implicitUserRole=false`, or
+      `trustedNetworks=` to the LAN only (both lines already exist, commented, in `runtime.cfg`).
+      Changing it will break anything that talks to REST anonymously — check before flipping it.
+- [ ] **UNVERIFIED — is :8080 reachable from the internet?** openHAB listens on `*:8080` and
+      `*:8443` (all interfaces). The firewall could not be read (`sudo ufw status` denied) and the
+      router config is not visible from this host. **Check the FRITZ!Box → Internet → Freigaben for
+      a port forward to :8080.** If one exists, the anonymous item access above is internet-facing,
+      which is a far bigger problem than either token. No openHAB Cloud connector is installed
+      (`services/openhabcloud.cfg` absent), so myopenhab is not a path in.
 
 ## 2. Stale thing type for Arbeitszimmer
 
