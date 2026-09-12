@@ -351,8 +351,16 @@ the `openhab` user**. That, not "someone turns the radiator on", is the token's 
       locally generated packets to 127.0.0.1, test artifact.) From inside the forgejo container
       (172.19.0.3) unauthenticated → **401**, so the docker bridges are really closed.
       VPN clients therefore need a login now — the phone app already authenticates as
-      `cneuhaus` (GoodWatch source), so nothing known breaks. When the SmartSwitch firmware is
-      next reflashed, give it an API token and shrink `trustedNetworks` to `127.0.0.1/32`.
+      `cneuhaus` (GoodWatch source), so nothing known breaks.
+      **Tightened 22:50:** Christian identified the SmartSwitch as `192.168.1.107`
+      (MAC `5c:cf:7f:8a:29:bd`, Espressif = ESP8266). `trustedNetworks` is now
+      `127.0.0.1/32, 192.168.1.107/32` — the rest of the LAN needs a login too.
+      - [ ] Give `5c:cf:7f:8a:29:bd` a DHCP reservation in the FRITZ!Box (Heimnetz → Netzwerk →
+            device → "immer die gleiche IPv4-Adresse zuweisen"); if its address ever changes the
+            Arbeitszimmer lamps silently stop reacting (401 is not logged anywhere).
+      - [ ] Verify with a real press: events.log must show `SmartSwitch1/2 received command ...
+            (source: org.openhab.core.io.rest)`.
+      - [ ] When the firmware is next reflashed, give it an API token and drop the `.107` entry.
       Uncommitted.
       Changing it will break anything that talks to REST anonymously — check before flipping it.
       **CHECKED 2026-09-12 22:20 — it WOULD break something. Do NOT flip it as-is.** events.log
@@ -438,3 +446,36 @@ outside now=22.1 °C  in 2h=22.1 °C  stops=17 °C / 18 °C
 
 Expected after reboot: all three Enabled=ON (you set them at 16:40). Küche 120min should
 **resume** to 18:40:51, not restart, if the reboot is before 18:40.
+
+## 10. Slow shutdown — DIAGNOSED 2026-09-12 22:40, fix needs root
+
+Every `systemctl stop/restart openhab` (and therefore every reboot) takes the full **2 minutes**
+and ends in **SIGKILL**. Journal, both stops on 2026-09-12 (16:18 and 16:48):
+`State 'stop-sigterm' timed out. Killing.` → `Failed with result 'timeout'`. The stop on
+2026-09-11 21:48 completed cleanly in 20 s, so it is a race, not deterministic.
+
+**Where it hangs** (Equinox thread dump in the journal, identical both times): the
+`Framework stop` thread sits in `org.openhab.core.io.net.http.internal.WebClientFactoryImpl.deactivate`
+→ `WebSocketClient.doStop` → `HttpClient.doStop` → `AbstractConnectorHttpClientTransport.doStop`
+→ `CountDownLatch.await`, forever. Cause in openHAB core 5.2.1: `deactivate()` stops the shared
+HTTP client first, which takes the shared `OH-httpClient-common` thread pool down with it, then
+stops the shared WebSocket client, whose selector shutdown needs that pool to run — so the latch
+never counts down. (`openhab.log` shows the matching `ManagedSelector ClosedSelectorException`
+WARN ~19 s after SIGTERM.) Nothing in this config causes it: no binding here uses the common
+WebSocket client; it is created eagerly by core. `main` in openhab-core now stops the pool
+explicitly last with stop timeout 0, so a later openHAB release may fix it — re-check after the
+next upgrade. Not caused by rules, timers or the JRuby script.
+
+**Fix (mitigation):** shorten systemd's stop timeout so the inevitable SIGKILL comes after 60 s
+instead of 120 s. A clean stop takes ~20 s; the hang is detectable at 30 s. Data safety is
+unchanged: today's stops are already SIGKILLed, just later. Needs root — the override is
+`root:root`:
+
+```
+! sudo sh -c 'printf "TimeoutStopSec=60\n" >> /etc/systemd/system/openhab.service.d/override.conf' && sudo systemctl daemon-reload && systemctl show openhab -p TimeoutStopUSec
+```
+(the override already has a `[Service]` section; the line lands inside it.)
+
+- [ ] Apply the override (above) and confirm `TimeoutStopUSec=1min`.
+- [ ] After the next upgrade, check `journalctl -u openhab | grep stop-sigterm` — if the hang is
+      gone, the override can stay anyway.
