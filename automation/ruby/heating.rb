@@ -421,6 +421,60 @@ rule 'Heating Kueche - Dinner' do
   end
 end
 
+# --- Re-assert: make the valve do what openHAB believes it should ---------------------------
+#
+# "Re-assert" = look at the room's switches and command the valve accordingly. It is the SAME
+# logic in two situations:
+#
+#   1. this script (re)loads              -> for every room whose valve is already reachable
+#   2. a valve thing goes ONLINE          -> for that one room (cold boot, FRITZ!Box reboot)
+#
+# WHY TWO SITUATIONS?  At a cold boot this script loads about 40 s BEFORE the FRITZ!Box has been
+# polled for the first time. Commanding a valve in that gap makes the avmfritz binding throw
+# (NullPointerException: getHkr() is null - seen on 2026-09-12 at 16:51 and again at 22:36).
+# So on load we can only handle rooms that are already reachable; the rest are handled the moment
+# their thing turns ONLINE, which is exactly when the binding has received the first device data.
+#
+# WHY NOT "is the mode item still NULL?" (the old check)?  Since 2026-09-12 mapdb restores every
+# item's last value at boot, BEFORE the first poll - so the item has a value while the binding
+# still has no device data. Only the thing status tells the truth.
+#
+# WHAT IT DOES for one room, first match wins:
+#   120min window ON  -> re-arm the timer with the REMAINING time and heat     (timed_updated)
+#   Comfort ON        -> heat                                                  (comfort_switched)
+#   neither           -> valve OFF. After a restart the valve may still be heating from before
+#                        openHAB went down (seen 2026-09-12 16:34: Arbeitszimmer at 21 °C while
+#                        openHAB said "off"). If openHAB says off, the valve must agree.
+def reassert(key)
+  r = room(key)
+  if r[:timed]&.on?
+    timed_updated(key, resume: true) # resume: keep the old deadline, do not grant a fresh 2h
+  elsif r[:comfort].on?
+    comfort_switched(key)
+  else
+    heat_off(r)
+  end
+end
+
+# "Is this room's valve reachable?"  The thing linked to the room's mode item must be ONLINE.
+# (No thing UIDs are written down here on purpose - the item link already knows its thing.)
+def valve_online?(r)
+  r[:mode].thing&.online? || false
+end
+
+# Situation 2: a valve thing has just turned ONLINE. Runs for ANY thing going online, so it first
+# checks whether the thing belongs to one of our rooms and ignores everything else (astro, mqtt…).
+rule 'Heating - valve came online → re-assert its room' do
+  changed things, to: :online
+  run do |event|
+    key, r = ROOMS.find { |_key, room| room[:mode].thing&.uid == event.thing.uid }
+    next unless key # not one of our valves
+
+    logger.info("#{r[:name]}: valve thing is online → re-asserting")
+    reassert(key)
+  end
+end
+
 # --- Load-time setup -------------------------------------------------------
 # Note for testing: openHAB's script watcher reacts to a CONTENT change, not to mtime. `touch`
 # alone will NOT reload this file - edit something real, or restart openHAB.
@@ -446,31 +500,17 @@ rule 'Heating - defaults and timers on load' do
       # update() is asynchronous, so the states written above may not have landed yet. That is
       # safe here only because disabled? keys on an explicit OFF: a not-yet-landed NULL counts
       # as enabled, so a restored 120min switch can never be bounced off by a lost race.
-      # Re-assert every room that should be heating, not only the timed ones: after a restart a
-      # room with just _Comfort restored ON would otherwise never be commanded, and the valve
-      # would keep whatever state it happened to be in.
+
+      # Situation 1 of "re-assert" (see the big comment above `def reassert`): every room whose
+      # valve is already reachable. Rooms that are not reachable yet are NOT forgotten - the rule
+      # 'Heating - valve came online' does them the moment the binding has polled.
       ROOMS.each_key do |key|
         r = room(key)
-        # Commanding a valve before its thing has done its first poll makes the binding throw
-        # (NullPointerException: getHkr() is null - seen at the 2026-09-12 16:51 boot, where
-        # Arbeitszimmer was commanded at 16:51:22 but only polled at 16:52:03). A nil mode state
-        # means "no device data yet", so skip the room entirely; the next scheduled action or
-        # switch press will put it right once the binding is up.
-        if r[:mode].state.nil?
-          logger.warn("#{r[:name]}: no device data yet on load → skipping re-assert")
+        unless valve_online?(r)
+          logger.info("#{r[:name]}: valve thing not online yet → re-assert waits for it")
           next
         end
-
-        if r[:timed]&.on?
-          timed_updated(key, resume: true) # pick up the remaining time, do not grant a fresh 2h
-        elsif r[:comfort].on?
-          comfort_switched(key)
-        else
-          # Assert OFF too, not just ON. After the 2026-09-12 16:34 restart the Arbeitszimmer
-          # valve was left heating at 21 °C while openHAB believed the room was off AND disabled.
-          # If openHAB says a room is not heating, the valve must agree.
-          heat_off(r)
-        end
+        reassert(key)
       end
     rescue StandardError => e
       logger.error("Heating on_load failed: #{e.class}: #{e.message} — #{e.backtrace&.first}")

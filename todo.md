@@ -26,6 +26,50 @@ before the master gate, so that line is real), and 20:00 `After Dinner → Küch
 the masters are switched ON before 23:00, the overnight/morning part of section B is void.
 The 16:51:22 NPE was re-checked: it is the one described in A, no new errors after 16:52.
 
+**Restart 2026-09-12 22:34:10 → 22:35:17 (systemctl restart, after the mapdb + REST changes).
+Results, analysed the same evening:**
+- [x] **mapdb restore PROVEN.** All three `Heating_*_Enabled` back ON, targets 19/21/21,
+      `_Comfort` OFF, `TooWarm` ON, StopTemps 17/18 — exactly the pre-restart values. The
+      `_Comfort_120min` and `_120min_Until` items came back NULL because they were never
+      updated after mapdb was installed (nothing to store); they will be from now on.
+      Restores do NOT appear in events.log (restore sets state without an event) — check via REST.
+- [x] Stop still hung (section 10) but was killed after **60 s** instead of 120 s. Restart
+      total 67 s. `Failed to kill control group ... Invalid argument` in the journal is systemd
+      noise, ignore.
+- [x] **The avmfritz NPE CAME BACK at 22:36:07 — the 16:55 guard is defeated by mapdb.** (Fixed
+      and proven 22:52, see the end of this item.)
+      `on_load` logged `Arbeitszimmer: radiator_mode → OFF (item was OFF)` — at 16:51 that was
+      `(item was )`, i.e. NULL. mapdb (`*`, restoreOnStartup) now restores
+      `Radiator_*_RadiatorMode` too, so the mode item is never NULL at boot and the
+      "NULL = no device data" heuristic no longer detects an un-polled thing. First FRITZ poll
+      was 22:36:49, 42 s after the command. Only one ERROR (one handler); Küche/Bad were already
+      polled or absorbed it. Effect is harmless (valve was OFF anyway) but the command is lost
+      and it is an ERROR at every boot.
+      **Correct guard = thing status.** Checked in the 5.2.x binding source
+      (`AVMFritzBaseThingHandler`): `initialize()` sets `UNKNOWN`; `ONLINE` is set only in
+      `onDeviceUpdated()` after the bridge delivered device data with `present == 1` — exactly
+      the moment `getHkr()` stops being null. Thing UIDs (all ONLINE now):
+      Küche `avmfritz:FRITZ_DECT_301:1:099950581490`,
+      Badezimmer `avmfritz:FRITZ_DECT_301:1:099950124754`,
+      Arbeitszimmer `avmfritz:FRITZ_DECT_302:1:139790923452` (the 302, not the phantom 301).
+      **FIXED in `heating.rb` 22:48 (approved by Christian), unproven until the next cold boot:**
+      one `reassert(key)` helper holds the logic once; `valve_online?(r)` asks the thing linked
+      to the mode item (`r[:mode].thing&.online?`, no UIDs copied); `on_load` re-asserts only
+      rooms whose valve is online and logs `valve thing not online yet → re-assert waits for it`
+      for the rest; new rule `'Heating - valve came online → re-assert its room'`
+      (`changed things, to: :online`) re-asserts a room when its valve thing turns ONLINE — this
+      also closes a gap: before, a skipped room at boot never re-armed its 120min timer, so a
+      restored window would have heated forever. Reloaded twice at 22:48 with no error, 21
+      heating rules registered. **At the next cold boot expect**, per room: the "waits for it"
+      line at load, then `valve thing is online → re-asserting` ~40 s later, and NO NPE.
+      Also covers a FRITZ!Box reboot (things go OFFLINE → ONLINE).
+      **PROVEN at the 22:51 cold restart:** load at 22:52:07 → Küche + Badezimmer (DECT 301)
+      were already online and re-asserted OFF; Arbeitszimmer (DECT 302) logged `valve thing not
+      online yet → re-assert waits for it`; at 22:52:50 (first poll of the 302, 43 s later)
+      `valve thing is online → re-asserting` → OFF. **No NPE, zero ERRORs.** All restored
+      states exact again (masters ON, targets 19/21/21). The 302 polls later than the 301s —
+      that is why only one handler ever threw. This stop was the clean variant: 21 s, no kill.
+
 ### A. Startup behaviour — ALREADY ANSWERED, do not re-investigate
 
 The reboot happened at **16:50:27 on 2026-09-12** and was fully analysed the same evening.
@@ -269,9 +313,9 @@ with no error anywhere. That is the worst possible failure mode for winter.
       `* : everyChange, everyUpdate, restoreOnStartup`. The 22:11:16 WARN `Tried to remove
       strategy container with serviceId 'rrd4j', but it was added by another provider` is the
       DELETE itself, harmless.
-- [ ] Prove it at the next cold boot: all three `Heating_*_Enabled` must come back exactly as
-      they were, and a running `_Comfort_120min` must log `resumed after reload` with its
-      `_120min_Until` intact.
+- [x] **Proven at the 22:35 restart** (section 0): all three `Heating_*_Enabled` and every other
+      seeded item came back exactly. Still unproven: a running `_Comfort_120min` surviving a
+      restart with its `_120min_Until` intact — needs a restart while a window is running.
 - [x] `persistence/jdbc.persist` fixed: openHAB 5's grammar (checked in
       `org.openhab.core.model.persistence-5.2.1.jar`, `Persistence.xtext`) has **no `default =`**
       in `Strategies` any more; the line was removed. Loaded cleanly at 22:00:23, the first time
@@ -352,7 +396,7 @@ the `openhab` user**. That, not "someone turns the radiator on", is the token's 
       (172.19.0.3) unauthenticated → **401**, so the docker bridges are really closed.
       VPN clients therefore need a login now — the phone app already authenticates as
       `cneuhaus` (GoodWatch source), so nothing known breaks.
-      **Tightened 22:50:** Christian identified the SmartSwitch as `192.168.1.107`
+      **Tightened ~22:33:** Christian identified the SmartSwitch as `192.168.1.107`
       (MAC `5c:cf:7f:8a:29:bd`, Espressif = ESP8266). `trustedNetworks` is now
       `127.0.0.1/32, 192.168.1.107/32` — the rest of the LAN needs a login too.
       - [ ] Give `5c:cf:7f:8a:29:bd` a DHCP reservation in the FRITZ!Box (Heimnetz → Netzwerk →
@@ -447,7 +491,7 @@ outside now=22.1 °C  in 2h=22.1 °C  stops=17 °C / 18 °C
 Expected after reboot: all three Enabled=ON (you set them at 16:40). Küche 120min should
 **resume** to 18:40:51, not restart, if the reboot is before 18:40.
 
-## 10. Slow shutdown — DIAGNOSED 2026-09-12 22:40, fix needs root
+## 10. Slow shutdown — DIAGNOSED 2026-09-12 ~22:25, mitigated via systemd
 
 Every `systemctl stop/restart openhab` (and therefore every reboot) takes the full **2 minutes**
 and ends in **SIGKILL**. Journal, both stops on 2026-09-12 (16:18 and 16:48):
@@ -476,6 +520,7 @@ unchanged: today's stops are already SIGKILLed, just later. Needs root — the o
 ```
 (the override already has a `[Service]` section; the line lands inside it.)
 
-- [ ] Apply the override (above) and confirm `TimeoutStopUSec=1min`.
+- [x] Override applied by Christian 22:33, `TimeoutStopUSec=1min`; the 22:34 restart hung as
+      predicted and was killed at 22:35:11, 61 s after `Stopping`.
 - [ ] After the next upgrade, check `journalctl -u openhab | grep stop-sigterm` — if the hang is
       gone, the override can stay anyway.
