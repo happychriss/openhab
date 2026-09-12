@@ -128,10 +128,28 @@ Switch Heating_Kueche_Comfort_120min
 Switch Heating_Badezimmer_Comfort
 Switch Heating_Badezimmer_Comfort_120min
 
-Switch Heating_ToWarm
+// Comfort temperature per room, set in the UI (8..28 °C, 0.5 steps).
+// Applied to the radiator's set_temp whenever the room heats.
+// Labelled "Solltemperatur", not "Komfort": Heating_<Room>_Comfort right above is a *switch*,
+// and two controls both called Komfort/Heizung on the same page are a trap.
+Number:Temperature Heating_Arbeitszimmer_Target "Solltemperatur Arbeitszimmer [%.1f %unit%]" <temperature> { stateDescription=""[min="8", max="28", step="0.5", pattern="%.1f %unit%"] }
+Number:Temperature Heating_Kueche_Target       "Solltemperatur Küche [%.1f %unit%]"        <temperature> { stateDescription=""[min="8", max="28", step="0.5", pattern="%.1f %unit%"] }
+Number:Temperature Heating_Badezimmer_Target   "Solltemperatur Badezimmer [%.1f %unit%]"   <temperature> { stateDescription=""[min="8", max="28", step="0.5", pattern="%.1f %unit%"] }
+
+// Master switch per room. OFF wins over everything: the radiator goes off and no
+// automation (cron, presence, 120min) may switch it on again until it is ON.
+Switch Heating_Arbeitszimmer_Enabled "Heizung Arbeitszimmer"
+Switch Heating_Kueche_Enabled        "Heizung Küche"
+Switch Heating_Badezimmer_Enabled    "Heizung Badezimmer"
+
+// End of the running 120min window, so a script reload resumes the remaining time instead of
+// granting a fresh 120 minutes. Written by heating.rb - not meant to be edited by hand.
+// Arbeitszimmer has no 120min switch, so it has no deadline item.
+DateTime Heating_Kueche_120min_Until     "Küche 120min bis [%1$tH:%1$tM]"
+DateTime Heating_Badezimmer_120min_Until "Badezimmer 120min bis [%1$tH:%1$tM]"
+
+// Set by the morning weather check: ON means "too warm, do not heat".
+Switch Heating_TooWarm
 // morning weather check: no heating when outside reaches these (set via UI)
 Number:Temperature Heating_StopTemp_Now "Heating stop - outside now [%.1f %unit%]" <temperature>
 Number:Temperature Heating_StopTemp_2h "Heating stop - outside in 2h [%.1f %unit%]" <temperature>
-// hi hi 
-
-// asdfsafd s dfasdf asdfasfd

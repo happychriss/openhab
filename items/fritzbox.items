@@ -1,45 +1,45 @@
 // DECT Heizung Arbeitszimmer avmfritz:FRITZ_DECT_302:1:139790923452 (new)
-String               FRITZDECT3011Arbeitszimmer_Mode           "Mode"                        {channel="avmfritz:FRITZ_DECT_302:1:139790923452:mode"}
-Contact              FRITZDECT3011Arbeitszimmer_Locked         "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_302:1:139790923452:locked"}
-Contact              FRITZDECT3011Arbeitszimmer_DeviceLocked   "Locked (manual)"             {channel="avmfritz:FRITZ_DECT_302:1:139790923452:device_locked"}
-Number:Temperature   FRITZDECT3011Arbeitszimmer_Temperature    "Current Temperature"         {channel="avmfritz:FRITZ_DECT_302:1:139790923452:temperature"}
-Number:Temperature   FRITZDECT3011Arbeitszimmer_ActualTemp     "Current Temperature"         {channel="avmfritz:FRITZ_DECT_302:1:139790923452:actual_temp"}
-Number:Temperature   FRITZDECT3011Arbeitszimmer_SetTemp        "Setpoint Temperature"        {channel="avmfritz:FRITZ_DECT_302:1:139790923452:set_temp"}
-Number:Temperature   FRITZDECT3011Arbeitszimmer_EcoTemp        "Eco Temperature"             {channel="avmfritz:FRITZ_DECT_302:1:139790923452:eco_temp"}
-Number:Temperature   FRITZDECT3011Arbeitszimmer_ComfortTemp    "Comfort Temperature"         {channel="avmfritz:FRITZ_DECT_302:1:139790923452:comfort_temp"}
-String               FRITZDECT3011Arbeitszimmer_RadiatorMode   "Radiator mode"               {channel="avmfritz:FRITZ_DECT_302:1:139790923452:radiator_mode"}
-DateTime             FRITZDECT3011Arbeitszimmer_NextChange     "Next Setpoint Change"        {channel="avmfritz:FRITZ_DECT_302:1:139790923452:next_change"}
-Number:Temperature   FRITZDECT3011Arbeitszimmer_NextTemp       "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_302:1:139790923452:next_temp"}
-Switch               FRITZDECT3011Arbeitszimmer_BatteryLow     "Low Battery"                 {channel="avmfritz:FRITZ_DECT_302:1:139790923452:battery_low"}
+String               Radiator_Arbeitszimmer_Mode           "Mode"                        {channel="avmfritz:FRITZ_DECT_302:1:139790923452:mode"}
+Contact              Radiator_Arbeitszimmer_Locked         "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_302:1:139790923452:locked"}
+Contact              Radiator_Arbeitszimmer_DeviceLocked   "Locked (manual)"             {channel="avmfritz:FRITZ_DECT_302:1:139790923452:device_locked"}
+Number:Temperature   Radiator_Arbeitszimmer_Temperature    "Current Temperature"         {channel="avmfritz:FRITZ_DECT_302:1:139790923452:temperature"}
+Number:Temperature   Radiator_Arbeitszimmer_ActualTemp     "Current Temperature"         {channel="avmfritz:FRITZ_DECT_302:1:139790923452:actual_temp"}
+Number:Temperature   Radiator_Arbeitszimmer_SetTemp        "Setpoint Temperature"        {channel="avmfritz:FRITZ_DECT_302:1:139790923452:set_temp"}
+Number:Temperature   Radiator_Arbeitszimmer_EcoTemp        "Eco Temperature"             {channel="avmfritz:FRITZ_DECT_302:1:139790923452:eco_temp"}
+Number:Temperature   Radiator_Arbeitszimmer_ComfortTemp    "Comfort Temperature"         {channel="avmfritz:FRITZ_DECT_302:1:139790923452:comfort_temp"}
+String               Radiator_Arbeitszimmer_RadiatorMode   "Radiator mode"               {channel="avmfritz:FRITZ_DECT_302:1:139790923452:radiator_mode"}
+DateTime             Radiator_Arbeitszimmer_NextChange     "Next Setpoint Change"        {channel="avmfritz:FRITZ_DECT_302:1:139790923452:next_change"}
+Number:Temperature   Radiator_Arbeitszimmer_NextTemp       "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_302:1:139790923452:next_temp"}
+Switch               Radiator_Arbeitszimmer_BatteryLow     "Low Battery"                 {channel="avmfritz:FRITZ_DECT_302:1:139790923452:battery_low"}
 
 
 // DECT Heizung Badezimmer
-String               FRITZDECT3011Badezimmer_Mode           "Mode"                        {channel="avmfritz:FRITZ_DECT_301:1:099950124754:mode"}
-Contact              FRITZDECT3011Badezimmer_Locked         "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_301:1:099950124754:locked"}
-Contact              FRITZDECT3011Badezimmer_DeviceLocked   "Locked (manual)"             {channel="avmfritz:FRITZ_DECT_301:1:099950124754:device_locked"}
-Number:Temperature   FRITZDECT3011Badezimmer_Temperature    "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950124754:temperature"}
-Number:Temperature   FRITZDECT3011Badezimmer_ActualTemp     "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950124754:actual_temp"}
-Number:Temperature   FRITZDECT3011Badezimmer_SetTemp        "Setpoint Temperature"        {channel="avmfritz:FRITZ_DECT_301:1:099950124754:set_temp"}
-Number:Temperature   FRITZDECT3011Badezimmer_EcoTemp        "Eco Temperature"             {channel="avmfritz:FRITZ_DECT_301:1:099950124754:eco_temp"}
-Number:Temperature   FRITZDECT3011Badezimmer_ComfortTemp    "Comfort Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950124754:comfort_temp"}
-String               FRITZDECT3011Badezimmer_RadiatorMode   "Radiator mode"               {channel="avmfritz:FRITZ_DECT_301:1:099950124754:radiator_mode"}
-DateTime             FRITZDECT3011Badezimmer_NextChange     "Next Setpoint Change"        {channel="avmfritz:FRITZ_DECT_301:1:099950124754:next_change"}
-Number:Temperature   FRITZDECT3011Badezimmer_NextTemp       "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_301:1:099950124754:next_temp"}
-Switch               FRITZDECT3011Badezimmer_BatteryLow     "Low Battery"                 {channel="avmfritz:FRITZ_DECT_301:1:099950124754:battery_low"}
+String               Radiator_Badezimmer_Mode           "Mode"                        {channel="avmfritz:FRITZ_DECT_301:1:099950124754:mode"}
+Contact              Radiator_Badezimmer_Locked         "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_301:1:099950124754:locked"}
+Contact              Radiator_Badezimmer_DeviceLocked   "Locked (manual)"             {channel="avmfritz:FRITZ_DECT_301:1:099950124754:device_locked"}
+Number:Temperature   Radiator_Badezimmer_Temperature    "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950124754:temperature"}
+Number:Temperature   Radiator_Badezimmer_ActualTemp     "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950124754:actual_temp"}
+Number:Temperature   Radiator_Badezimmer_SetTemp        "Setpoint Temperature"        {channel="avmfritz:FRITZ_DECT_301:1:099950124754:set_temp"}
+Number:Temperature   Radiator_Badezimmer_EcoTemp        "Eco Temperature"             {channel="avmfritz:FRITZ_DECT_301:1:099950124754:eco_temp"}
+Number:Temperature   Radiator_Badezimmer_ComfortTemp    "Comfort Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950124754:comfort_temp"}
+String               Radiator_Badezimmer_RadiatorMode   "Radiator mode"               {channel="avmfritz:FRITZ_DECT_301:1:099950124754:radiator_mode"}
+DateTime             Radiator_Badezimmer_NextChange     "Next Setpoint Change"        {channel="avmfritz:FRITZ_DECT_301:1:099950124754:next_change"}
+Number:Temperature   Radiator_Badezimmer_NextTemp       "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_301:1:099950124754:next_temp"}
+Switch               Radiator_Badezimmer_BatteryLow     "Low Battery"                 {channel="avmfritz:FRITZ_DECT_301:1:099950124754:battery_low"}
 
 // DECT Heizung Kueche
-String               FRITZDECT3011Kueche_Mode                   "Mode"                        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:mode"}
-Contact              FRITZDECT3011Kueche_Locked                 "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_301:1:099950581490:locked"}
-Contact              FRITZDECT3011Kueche_DeviceLocked           "Locked (manual)"             {channel="avmfritz:FRITZ_DECT_301:1:099950581490:device_locked"}
-Number:Temperature   FRITZDECT3011Kueche_Temperature            "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950581490:temperature"}
-Number:Temperature   FRITZDECT3011Kueche_ActualTemp             "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950581490:actual_temp"}
-Number:Temperature   FRITZDECT3011Kueche_SetTemp                "Setpoint Temperature"        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:set_temp"}
-Number:Temperature   FRITZDECT3011Kueche_EcoTemp                "Eco Temperature"             {channel="avmfritz:FRITZ_DECT_301:1:099950581490:eco_temp"}
-Number:Temperature   FRITZDECT3011Kueche_ComfortTemp            "Comfort Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950581490:comfort_temp"}
-String               FRITZDECT3011Kueche_RadiatorMode           "Radiator mode"               {channel="avmfritz:FRITZ_DECT_301:1:099950581490:radiator_mode"}
-DateTime             FRITZDECT3011Kueche_NextChange             "Next Setpoint Change"        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:next_change"}
-Number:Temperature   FRITZDECT3011Kueche_NextTemp               "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_301:1:099950581490:next_temp"}
-Switch               FRITZDECT3011Kueche_BatteryLow             "Low Battery"                 {channel="avmfritz:FRITZ_DECT_301:1:099950581490:battery_low"}
+String               Radiator_Kueche_Mode                   "Mode"                        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:mode"}
+Contact              Radiator_Kueche_Locked                 "Device locked (external)"    {channel="avmfritz:FRITZ_DECT_301:1:099950581490:locked"}
+Contact              Radiator_Kueche_DeviceLocked           "Locked (manual)"             {channel="avmfritz:FRITZ_DECT_301:1:099950581490:device_locked"}
+Number:Temperature   Radiator_Kueche_Temperature            "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950581490:temperature"}
+Number:Temperature   Radiator_Kueche_ActualTemp             "Current Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950581490:actual_temp"}
+Number:Temperature   Radiator_Kueche_SetTemp                "Setpoint Temperature"        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:set_temp"}
+Number:Temperature   Radiator_Kueche_EcoTemp                "Eco Temperature"             {channel="avmfritz:FRITZ_DECT_301:1:099950581490:eco_temp"}
+Number:Temperature   Radiator_Kueche_ComfortTemp            "Comfort Temperature"         {channel="avmfritz:FRITZ_DECT_301:1:099950581490:comfort_temp"}
+String               Radiator_Kueche_RadiatorMode           "Radiator mode"               {channel="avmfritz:FRITZ_DECT_301:1:099950581490:radiator_mode"}
+DateTime             Radiator_Kueche_NextChange             "Next Setpoint Change"        {channel="avmfritz:FRITZ_DECT_301:1:099950581490:next_change"}
+Number:Temperature   Radiator_Kueche_NextTemp               "Next Setpoint Temperature"   {channel="avmfritz:FRITZ_DECT_301:1:099950581490:next_temp"}
+Switch               Radiator_Kueche_BatteryLow             "Low Battery"                 {channel="avmfritz:FRITZ_DECT_301:1:099950581490:battery_low"}
 
                                                             
 // Important - Config for MAC address is also in Fritzbox - Things, also Pixel phone changes its MAC automatically -needs to be disabled    

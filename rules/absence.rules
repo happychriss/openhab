@@ -59,8 +59,10 @@ then
   if(AbsenceMode.state == ON)
   {
 	logInfo("absence_rule", "Alarm Mode was enabled")
-	Heating_Arbeitszimmer_Comfort.sendCommand(OFF)
-    Heating_Kueche_Comfort.sendCommand(OFF)
+	// Heating is NOT touched here on purpose. AbsenceMode only goes ON when both of us are out,
+	// which means CNOut is already ON, and 'Heating - Christian leaves' in automation/ruby/heating.rb
+	// has already switched Arbeitszimmer + Küche off (including the Küche 120min, which this rule
+	// used to miss). Heating lives in heating.rb - do not add heating commands back here.
 	sendCommand(Sonoff4,OFF) // no music needed
 	sendCommand(Lights,OFF)
   } else
