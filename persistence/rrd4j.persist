@@ -1,0 +1,12 @@
+// rrd4j is for charting only. It averages values into round-robin archives, which is fine for
+// numbers but restores Switches wrongly and cannot store DateTime at all (todo.md section 7b,
+// found 2026-09-12: all Heating_*_Enabled masters came back OFF after a reboot).
+// This file mirrors the built-in default minus restoreOnStartup; mapdb.persist does the restore.
+// A UI-managed rrd4j config (jsondb) overrides this file; it was deleted via REST on 2026-09-12.
+Strategies {
+    everyMinute : "0 * * * * ?"
+}
+
+Items {
+    * : strategy = everyChange, everyMinute
+}

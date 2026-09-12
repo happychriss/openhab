@@ -1,0 +1,7 @@
+// mapdb keeps exactly one value per item: the last one. It restores that exact value on startup,
+// which is what the heating control items need (Heating_*_Enabled, _Comfort, _Comfort_120min,
+// _Target, _120min_Until). rrd4j.persist deliberately has no restoreOnStartup so the two services
+// never fight. everyUpdate is included so every item is seeded, not only ones that change.
+Items {
+    * : strategy = everyChange, everyUpdate, restoreOnStartup
+}

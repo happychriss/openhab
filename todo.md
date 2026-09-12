@@ -20,6 +20,12 @@ weather guard, the 120min logic or the new scheduling. Check
 `curl -s localhost:8080/rest/items/Heating_Kueche_Enabled/state` first; if OFF, the only finding is
 "masters were not restored", and the cycle needs re-running on another day.
 
+**Status check 2026-09-12 ~21:30:** all three `Heating_*_Enabled` masters were still **OFF**
+(verified via REST). The 18:00 Dinner rule logged a genuine `TOO WARM` decision (weather check runs
+before the master gate, so that line is real), and 20:00 `After Dinner → Küche OFF` fired. Unless
+the masters are switched ON before 23:00, the overnight/morning part of section B is void.
+The 16:51:22 NPE was re-checked: it is the one described in A, no new errors after 16:52.
+
 ### A. Startup behaviour — ALREADY ANSWERED, do not re-investigate
 
 The reboot happened at **16:50:27 on 2026-09-12** and was fully analysed the same evening.
@@ -66,8 +72,9 @@ Results, so the next session does not repeat the work:
 - [ ] Confirm no 120min window was silently extended (each should be exactly 120 min).
 
 ### C. Still open, needs a decision
-- [ ] **Install mapdb + persistence fix (section 7b)** — winter-critical, the masters-OFF bug.
-- [ ] `jdbc.persist` has not parsed since August (section 3) — JDBC records nothing.
+- [x] **mapdb + persistence fix (section 7b)** — done 2026-09-12 22:11, unproven until the next
+      cold boot. Uncommitted: `persistence/{mapdb,rrd4j,jdbc}.persist`, `todo.md`.
+- [x] `jdbc.persist` parses again (section 7b) — `default =` line removed, loaded 22:00:23.
 - [x] **Committed + pushed 2026-09-12 as `be07f7f`** — `heating.rb`, `main.items`,
       `fritzbox.items`, `absence.rules`, `jdbc.persist`, deleted `layout/main.yaml`,
       `todo.md` + `CLAUDE.md`. Deliberately left OUT of that commit, still uncommitted:
@@ -236,15 +243,40 @@ optional polish.
 Consequence: **after any restart the master switches may come back OFF and nothing will heat**,
 with no error anywhere. That is the worst possible failure mode for winter.
 
-- [ ] Add an explicit `rrd4j.persist` so rrd4j only charts the numeric items it is good at, and
-      give the heating control items (`Heating_*_Enabled`, `_Comfort`, `_Comfort_120min`,
-      `_Target`, `_120min_Until`) a service that restores the exact last value. mapdb is the
-      conventional openHAB choice for restoreOnStartup; rrd4j is for charting.
-- [ ] Until then, check the three master switches after every openHAB restart.
-- [ ] Also fix `persistence/jdbc.persist`: it has failed to parse since at least August
-      (`[9,5]: no viable alternative at input 'default'`, the `default = everyChange` line) and is
-      being **ignored entirely**, so JDBC has been recording nothing. Pre-existing, unrelated to
-      the rename — confirmed present in all 7 rotated logs and byte-identical in `git show HEAD`.
+**Implemented 2026-09-12 ~22:00 (no restart), with one step left for Christian:**
+
+- [x] **Real root cause found.** "There is no `rrd4j.persist`" was only half true: there is a
+      **UI-managed** rrd4j configuration in
+      `/var/lib/openhab/jsondb/org.openhab.core.persistence.PersistenceServiceConfiguration.json`
+      with `* : restoreOnStartup, everyChange, everyMinute`. That is where the wrong Switch
+      restores come from. A managed config **wins over the file**: the new `rrd4j.persist` was
+      rejected at 22:00:17 with `Cannot add "PersistenceServiceConfiguration" with key "rrd4j". It
+      exists already from provider "ManagedPersistenceServiceConfigurationProvider"`.
+- [x] `persistence/mapdb.persist` written: `* : everyChange, everyUpdate, restoreOnStartup`.
+      mapdb add-on installed via REST (`POST /rest/addons/persistence-mapdb/install`, 22:01),
+      registered as service `mapdb`, storing to `/var/lib/openhab/persistence/mapdb/storage.mapdb`.
+      Seeded by re-posting the current state of the 3 masters, 3 targets, 3 `_Comfort`, both
+      `StopTemp` and `TooWarm` (all `changed`-triggered, so a same-value update is inert; the
+      `_Comfort_120min` items were deliberately NOT re-posted because they are `updated`-triggered).
+      Verified via `GET /rest/persistence/items/<item>?serviceId=mapdb`: exact values, e.g.
+      `Heating_Kueche_Enabled = ON`, `Heating_Kueche_Target = 19`.
+- [x] `persistence/rrd4j.persist` written (everyChange + everyMinute for `*`, **no**
+      restoreOnStartup) — but currently **ignored**, see next item.
+- [x] **Managed rrd4j config deleted** by Christian at 22:11 (`DELETE /rest/persistence/rrd4j`
+      → 200; jsondb file now `{}`). `rrd4j.persist` re-saved and loaded at 22:11:33 with no
+      `Cannot add` warning. `GET /rest/persistence/rrd4j` now shows `* : everyChange, everyMinute`
+      (no restoreOnStartup); `GET /rest/persistence/mapdb` shows
+      `* : everyChange, everyUpdate, restoreOnStartup`. The 22:11:16 WARN `Tried to remove
+      strategy container with serviceId 'rrd4j', but it was added by another provider` is the
+      DELETE itself, harmless.
+- [ ] Prove it at the next cold boot: all three `Heating_*_Enabled` must come back exactly as
+      they were, and a running `_Comfort_120min` must log `resumed after reload` with its
+      `_120min_Until` intact.
+- [x] `persistence/jdbc.persist` fixed: openHAB 5's grammar (checked in
+      `org.openhab.core.model.persistence-5.2.1.jar`, `Persistence.xtext`) has **no `default =`**
+      in `Strategies` any more; the line was removed. Loaded cleanly at 22:00:23, the first time
+      since August. Each item already named `every5Minutes`, so behaviour is as configured.
+      Not yet verified that rows actually land in Postgres `oh_persistence`.
 
 ## 8. Comfort vs. cool — the household rules, decided 2026-09-12
 
@@ -310,10 +342,32 @@ the `openhab` user**. That, not "someone turns the radiator on", is the token's 
 
 ### The two findings that matter more than the tokens
 
-- [ ] **`implicitUserRole` is on (default).** Unauthenticated item read+command from anywhere that
-      can reach the port. Consider setting `org.openhab.restauth:implicitUserRole=false`, or
-      `trustedNetworks=` to the LAN only (both lines already exist, commented, in `runtime.cfg`).
+- [x] **`implicitUserRole` — DONE 2026-09-12 22:26, no restart.** `services/runtime.cfg` now has
+      `implicitUserRole=false` + `trustedNetworks=127.0.0.1/32, 192.168.1.0/24` (both lines are
+      needed: trustedNetworks is ignored while implicitUserRole is on). Applied live within
+      seconds. Verified with `curl --interface <src>` against `/rest/items` unauthenticated:
+      LAN 192.168.1.110 → 200, localhost → 200, WireGuard 10.10.0.1 → **401**, with token → 200.
+      (A host-side test with `--interface 172.19.0.1` gives 200 — docker's MASQUERADE rewrites
+      locally generated packets to 127.0.0.1, test artifact.) From inside the forgejo container
+      (172.19.0.3) unauthenticated → **401**, so the docker bridges are really closed.
+      VPN clients therefore need a login now — the phone app already authenticates as
+      `cneuhaus` (GoodWatch source), so nothing known breaks. When the SmartSwitch firmware is
+      next reflashed, give it an API token and shrink `trustedNetworks` to `127.0.0.1/32`.
+      Uncommitted.
       Changing it will break anything that talks to REST anonymously — check before flipping it.
+      **CHECKED 2026-09-12 22:20 — it WOULD break something. Do NOT flip it as-is.** events.log
+      tags every REST command with its source. Across all retained logs (2026-08-02 → 09-12):
+      `SmartSwitch1`/`SmartSwitch2` (67 commands) come from `org.openhab.core.io.rest` with NO
+      user = **anonymous** — that is the self-built Arbeitszimmer switch device
+      (`rules/arbeitszimmer.rules`, Stehlampe + Deckenleuchte). `GoodWatch` (16) comes from
+      `org.openhab.core.io.rest$cneuhaus` = authenticated, unaffected. Nothing else uses REST.
+      A second review session claimed "no local config depends on unauthenticated REST" — that
+      was based on live TCP connections only; the device connects for milliseconds per press.
+      Options: (a) give the device an API token / basic auth (allowBasicAuth is on) — needs a
+      firmware change on the self-built device; (b) `trustedNetworks=192.168.1.0/24` instead of
+      disabling implicitUserRole — keeps the LAN as it is today, blocks docker (172.19/172.20)
+      and anything from outside; (c) both. Recommendation: (b) now, (a) when the device is next
+      reflashed.
 - [ ] **UNVERIFIED — is :8080 reachable from the internet?** openHAB listens on `*:8080` and
       `*:8443` (all interfaces). The firewall could not be read (`sudo ufw status` denied) and the
       router config is not visible from this host. **Check the FRITZ!Box → Internet → Freigaben for

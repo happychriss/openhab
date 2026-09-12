@@ -6,11 +6,11 @@ Strategies {
     everyMinute : "0 * * * * ?"
     everyHour   : "0 0 * * * ?"
     everyDay    : "0 0 0 * * ?"
-    default = everyChange
 }
 
 Items {
-    // Persist all items on every change and every minute
+    // Sampled every 5 minutes. openHAB 5 dropped "default =" from Strategies (it failed to parse
+    // since August 2026 and JDBC recorded nothing); each item names its strategy explicitly.
     arbeitszimmer_toggle,
     Temperature_Draussen_sonoff,
     Temperature_Arbeitszimmer_sonoff,
