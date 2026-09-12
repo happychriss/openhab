@@ -68,8 +68,12 @@ Results, so the next session does not repeat the work:
 ### C. Still open, needs a decision
 - [ ] **Install mapdb + persistence fix (section 7b)** — winter-critical, the masters-OFF bug.
 - [ ] `jdbc.persist` has not parsed since August (section 3) — JDBC records nothing.
-- [ ] Nothing is committed yet: `heating.rb`, `main.items`, `fritzbox.items`, `absence.rules`,
-      `jdbc.persist`, deleted `layout/main.yaml`, untracked `todo.md` + `CLAUDE.md`.
+- [x] **Committed + pushed 2026-09-12 as `be07f7f`** — `heating.rb`, `main.items`,
+      `fritzbox.items`, `absence.rules`, `jdbc.persist`, deleted `layout/main.yaml`,
+      `todo.md` + `CLAUDE.md`. Deliberately left OUT of that commit, still uncommitted:
+      `services/runtime.cfg.dpkg-old` (packaging backup, see section 3) and
+      `sounds/doorbell.mp3` (unexplained binary change). Both are unrelated to heating;
+      neither contains secrets — the dpkg-old diff was checked line by line.
 - [ ] Revoke the `claudebot` / `claudebot2` API tokens.
 - [ ] `things/fritzbox.things:11` still declares the 302 as a `FRITZ_DECT_301` (section 2) —
       deliberately untouched; the file declares a different thing UID than the live JSONDB thing,
